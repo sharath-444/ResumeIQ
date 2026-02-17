@@ -1,6 +1,6 @@
 # ResumeIQ 🚀
 
-ResumeIQ is a modern, AI-powered resume analyzer that helps job seekers optimize their resumes for Applicant Tracking Systems (ATS).
+ResumeIQ is a modern, AI-powered resume analyzer that helps job seekers optimize their resumes for Applicant Tracking Systems (ATS). It evaluates resumes for ATS compatibility, provides skill-gap insights, and offers improvement suggestions. The platform features role-based authentication with separate admin and user dashboards for managing and reviewing resume reports.
 
 ## Features
 
@@ -12,10 +12,11 @@ ResumeIQ is a modern, AI-powered resume analyzer that helps job seekers optimize
     - Radar Chart for score breakdown.
     - Skill Gap Analysis.
 - **💡 Smart Suggestions**: Actionable feedback and "Power Verb" recommendations.
+- **🔐 Secure Access**: Role-based authentication (User/Admin) and secure data handling.
 
 ## Tech Stack
 
-- **Backend**: Python, Flask
+- **Backend**: Python, Flask, SQLAlchemy, Flask-Login
 - **Frontend**: HTML5, TailwindCSS (CDN), JavaScript
 - **Parsing**: PyPDF2, python-docx
 - **Charts**: Chart.js
@@ -45,6 +46,7 @@ ResumeIQ is a modern, AI-powered resume analyzer that helps job seekers optimize
 2. **Open your browser**:
    Navigate to `http://127.0.0.1:5000`
 3. **Analyze**:
+   - Register/Login to access the dashboard.
    - Select your target role.
    - Drag and drop your resume.
    - View your simplified ATS report!
@@ -63,6 +65,9 @@ ResumeIQ/
 ├── templates/
 │   ├── base.html       # Base layout
 │   ├── index.html      # Landing & Upload page
+│   ├── dashboard.html  # User Dashboard
+│   ├── register.html   # Registration Page
+│   └── login.html      # Login Page
 │   └── result.html     # Analysis Dashboard
 └── utils/
     ├── analyzer.py     # Skill gap & suggestion logic
