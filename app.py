@@ -13,7 +13,8 @@ bcrypt = Bcrypt()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'dev-secret-key-resumeiq-secure' # Fixed key for development
+    # Use environment variable for secret key in production, fallback for dev
+    app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-resumeiq-secure')
     app.config['UPLOAD_FOLDER'] = 'uploads'
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///resumeiq.db'
