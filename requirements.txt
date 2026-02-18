@@ -8,3 +8,5 @@ Flask-Bcrypt==1.0.1
 
 streamlit
 pandas
+
+Flask-Mail

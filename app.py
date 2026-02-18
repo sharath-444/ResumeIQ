@@ -50,7 +50,7 @@ def create_app():
         models_db.create_all()
         if not User.query.filter_by(username='admin').first():
             hashed_password = bcrypt.generate_password_hash('password123').decode('utf-8')
-            admin = User(username='admin', password=hashed_password, role='admin')
+            admin = User(username='admin', email='admin@gmail.com', password=hashed_password, role='admin')
             models_db.session.add(admin)
             models_db.session.commit()
             print("Default Admin Created")
