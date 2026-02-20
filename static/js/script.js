@@ -187,15 +187,18 @@ function playTerminalAnimation() {
     });
 }
 
-/* --- RESULT PAGE LOGIC --- */
 function initResultPage() {
-    const dataString = localStorage.getItem('resumeAnalysis');
-    if (!dataString) {
-        window.location.href = '/';
-        return;
+    let data;
+    if (window.SERVER_DATA) {
+        data = window.SERVER_DATA;
+    } else {
+        const dataString = localStorage.getItem('resumeAnalysis');
+        if (!dataString) {
+            window.location.href = '/';
+            return;
+        }
+        data = JSON.parse(dataString);
     }
-
-    const data = JSON.parse(dataString);
 
     // Populate Data
     document.getElementById('targetRoleDisplay').textContent = data.role;

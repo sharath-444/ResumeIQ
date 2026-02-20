@@ -1,6 +1,7 @@
 from flask import Flask
 from io import open
 import os
+import sys
 import secrets
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -12,12 +13,42 @@ login_manager = LoginManager()
 bcrypt = Bcrypt()
 
 def create_app():
-    app = Flask(__name__)
+    # Detect if we are running in a bundled PyInstaller environment
+    if getattr(sys, 'frozen', False):
+        template_folder = os.path.join(sys._MEIPASS, 'templates')
+        static_folder = os.path.join(sys._MEIPASS, 'static')
+        app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+    else:
+        app = Flask(__name__)
+
     # Use environment variable for secret key in production, fallback for dev
     app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-resumeiq-secure')
-    app.config['UPLOAD_FOLDER'] = 'uploads'
+    # Detect Environment
+    is_vercel = os.environ.get('VERCEL') == '1'
+    is_frozen = getattr(sys, 'frozen', False)
+
+    if is_vercel:
+        # Vercel Environment (Cloud)
+        # SQLite is ephemeral on Vercel, but works for the current session.
+        # Uploads go to /tmp as Vercel has a read-only filesystem except for /tmp.
+        app_data_path = os.getcwd() 
+        app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(app_data_path, "resumeiq.db")}'
+        print("Running in Cloud (Vercel) mode")
+    elif is_frozen:
+        # Desktop Bundle Environment (.exe)
+        app_data_path = os.path.join(os.path.expanduser('~'), 'Documents', 'ResumeIQ_Data')
+        app.config['UPLOAD_FOLDER'] = os.path.join(app_data_path, 'uploads')
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(app_data_path, "resumeiq.db")}'
+        print(f"Running in Desktop (Frozen) mode. Data at: {app_data_path}")
+    else:
+        # Standard Development Environment
+        app_data_path = os.getcwd()
+        app.config['UPLOAD_FOLDER'] = 'uploads'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///resumeiq.db'
+        print("Running in Development mode")
+
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///resumeiq.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -58,6 +89,7 @@ def create_app():
 
     return app
 
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True)

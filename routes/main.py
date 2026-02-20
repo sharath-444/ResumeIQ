@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, flash, current_app
+from flask import Blueprint, render_template, request, jsonify, flash, current_app, redirect, url_for
 from flask_login import login_required, current_user
 import os
 import secrets
@@ -12,6 +12,11 @@ main = Blueprint('main', __name__)
 @main.route('/')
 def index():
     return render_template('index.html')
+
+@main.route('/builder')
+@login_required
+def builder():
+    return render_template('builder.html')
 
 @main.route('/upload', methods=['POST'])
 @login_required
@@ -90,6 +95,22 @@ def upload_file():
 def result():
     return render_template('result.html')
 
+@main.route('/result/<int:resume_id>')
+@login_required
+def view_result(resume_id):
+    resume = Resume.query.get_or_404(resume_id)
+    
+    # Security: Ensure only the owner can view the report
+    if resume.user_id != current_user.id:
+        flash("You do not have permission to view this report.", "error")
+        return redirect(url_for('main.dashboard'))
+    
+    # Parse the analysis data for the template
+    import json
+    analysis_data = json.loads(resume.analysis_data) if resume.analysis_data else {}
+    
+    return render_template('result.html', server_data=analysis_data)
+
 @main.route('/dashboard')
 @login_required
 def dashboard():
@@ -100,3 +121,9 @@ def dashboard():
         if r.analysis_data:
             r.data = json.loads(r.analysis_data)
     return render_template('dashboard.html', resumes=resumes)
+
+@main.route('/open-browser')
+def open_browser_link():
+    import webbrowser
+    webbrowser.open('http://127.0.0.1:5000')
+    return jsonify({'success': True})

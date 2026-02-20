@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<script>
+    window.SERVER_DATA = {{ server_data|tojson|safe if server_data else 'null' }};
+</script>
 <div class="min-h-screen pt-28 pb-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
 

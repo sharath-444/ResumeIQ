@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-12 px-4 bg-[#0a0a0a]">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col lg:flex-row gap-8">
+
+            <!-- Left: Controls -->
+            <div class="w-full lg:w-1/2 space-y-6">
+                <div class="glass-panel p-6 rounded-2xl border border-white/10">
+                    <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                        <i class="fa-solid fa-pen-to-square mr-3 text-neon"></i>
+                        Resume Builder (Fresher)
+                    </h2>
+
+                    <div class="space-y-6">
+                        <!-- Personal Details -->
+                        <section>
+                            <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Personal
+                                Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Full Name</label>
+                                    <input type="text" id="input-name" value="Praveen D" placeholder="John Doe"
+                                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-neon transition">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Phone Number</label>
+                                    <input type="text" id="input-phone" value="7795143853" placeholder="+91 1234567890"
+                                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-neon transition">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs text-gray-500 mb-1">Email</label>
+                                    <input type="email" id="input-email" value="praveen.durgesh06@gmail.com"
+                                        placeholder="praveen@example.com"
+                                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-neon transition">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs text-gray-500 mb-1">Summary / Objective</label>
+                                    <textarea id="input-summary" rows="3"
+                                        placeholder="Motivated fresher with a strong foundation in..."
+                                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-neon transition"></textarea>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Education -->
+                        <section id="education-section">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Education</h3>
+                                <button onclick="addItem('education')" class="text-xs text-neon hover:underline">+ Add
+                                    Education</button>
+                            </div>
+                            <div id="education-list" class="space-y-4">
+                                <div class="item-block bg-white/5 p-4 rounded-xl border border-white/10 relative group">
+                                    <input type="text" placeholder="Degree (e.g. B.Tech in Computer Science)"
+                                        class="input-degree w-full bg-transparent text-white font-bold mb-2 focus:outline-none">
+                                    <input type="text" placeholder="University Name"
+                                        class="input-school w-full bg-transparent text-gray-400 text-sm mb-2 focus:outline-none">
+                                    <div class="flex gap-4">
+                                        <input type="text" placeholder="Year (2020 - 2024)"
+                                            class="input-year w-1/2 bg-transparent text-gray-500 text-xs focus:outline-none">
+                                        <input type="text" placeholder="GPA / Percentage"
+                                            class="input-grade w-1/2 bg-transparent text-gray-500 text-xs focus:outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Skills -->
+                        <section>
+                            <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Technical
+                                Skills</h3>
+                            <textarea id="input-skills" rows="2"
+                                placeholder="Java, Python, HTML, CSS, JavaScript, React..."
+                                class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-neon transition"></textarea>
+                            <p class="text-[10px] text-gray-600 mt-1">Separate skills with commas</p>
+                        </section>
+
+                        <!-- Projects -->
+                        <section id="project-section">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Academic
+                                    Projects</h3>
+                                <button onclick="addItem('project')" class="text-xs text-neon hover:underline">+ Add
+                                    Project</button>
+                            </div>
+                            <div id="project-list" class="space-y-4">
+                                <div class="item-block bg-white/5 p-4 rounded-xl border border-white/10 relative group">
+                                    <input type="text" placeholder="Project Title"
+                                        class="input-proj-title w-full bg-transparent text-white font-bold mb-2 focus:outline-none">
+                                    <textarea placeholder="Brief description of your role and tools used..."
+                                        class="input-proj-desc w-full bg-transparent text-gray-400 text-sm focus:outline-none"
+                                        rows="2"></textarea>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="pt-6 border-t border-white/10">
+                            <button onclick="window.print()"
+                                class="w-full bg-neon text-black font-bold py-3 rounded-xl hover:bg-white transition flex items-center justify-center">
+                                <i class="fa-solid fa-file-pdf mr-2"></i> Download / Print Resume
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Preview -->
+            <div class="w-full lg:w-1/2">
+                <div class="sticky top-28">
+                    <!-- The Paper Container -->
+                    <div id="resume-preview"
+                        class="bg-white text-black p-8 shadow-2xl rounded-sm aspect-[1/1.414] overflow-hidden">
+                        <!-- Preview Content -->
+                        <div id="preview-content" class="h-full border-t-[8px] border-black pt-8">
+                            <header class="text-center mb-6">
+                                <h1 id="preview-name"
+                                    class="text-3xl font-serif font-bold uppercase tracking-widest mb-1">Praveen D</h1>
+                                <div class="flex justify-center gap-4 text-xs text-gray-600 italic">
+                                    <span id="preview-phone">7795143853</span>
+                                    <span id="preview-email"></span>
+                                </div>
+                            </header>
+
+                            <section class="mb-6">
+                                <h2
+                                    class="text-xs font-bold border-b border-gray-300 pb-1 mb-2 uppercase tracking-wider">
+                                    Career Objective</h2>
+                                <p id="preview-summary" class="text-xs leading-relaxed text-gray-800"></p>
+                            </section>
+
+                            <section class="mb-6">
+                                <h2
+                                    class="text-xs font-bold border-b border-gray-300 pb-1 mb-2 uppercase tracking-wider">
+                                    Education</h2>
+                                <div id="preview-education" class="space-y-3">
+                                    <!-- Dynamic -->
+                                </div>
+                            </section>
+
+                            <section class="mb-6">
+                                <h2
+                                    class="text-xs font-bold border-b border-gray-300 pb-1 mb-2 uppercase tracking-wider">
+                                    Technical Skills</h2>
+                                <div id="preview-skills-container" class="flex flex-wrap gap-x-3 gap-y-1">
+                                    <!-- Dynamic -->
+                                </div>
+                            </section>
+
+                            <section class="mb-6">
+                                <h2
+                                    class="text-xs font-bold border-b border-gray-300 pb-1 mb-2 uppercase tracking-wider">
+                                    Academic Projects</h2>
+                                <div id="preview-projects" class="space-y-4">
+                                    <!-- Dynamic -->
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                    <p class="text-center text-gray-500 text-xs mt-4 italic">Note: Live preview might vary slightly from
+                        printed version.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #resume-preview,
+        #resume-preview * {
+            visibility: visible;
+        }
+
+        #resume-preview {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 40px;
+            box-shadow: none;
+            border-radius: 0;
+        }
+
+        .container,
+        .glass-panel,
+        nav,
+        footer {
+            display: none !important;
+        }
+    }
+</style>
+
+<script>
+    function updatePreview() {
+        document.getElementById('preview-name').innerText = document.getElementById('input-name').value || 'Praveen D';
+        document.getElementById('preview-phone').innerText = document.getElementById('input-phone').value || '7795143853';
+        document.getElementById('preview-email').innerText = document.getElementById('input-email').value;
+        document.getElementById('preview-summary').innerText = document.getElementById('input-summary').value;
+
+        // Update Skills
+        const skillsText = document.getElementById('input-skills').value;
+        const skillsArr = skillsText.split(',').map(s => s.trim()).filter(s => s);
+        const skillsContainer = document.getElementById('preview-skills-container');
+        skillsContainer.innerHTML = '';
+        skillsArr.forEach(skill => {
+            const span = document.createElement('span');
+            span.className = 'text-xs text-gray-800';
+            span.innerText = '• ' + skill;
+            skillsContainer.appendChild(span);
+        });
+
+        // Update Education
+        const eduList = document.getElementById('preview-education');
+        eduList.innerHTML = '';
+        document.querySelectorAll('#education-list .item-block').forEach(block => {
+            const degree = block.querySelector('.input-degree').value;
+            const school = block.querySelector('.input-school').value;
+            const year = block.querySelector('.input-year').value;
+            const grade = block.querySelector('.input-grade').value;
+
+            if (degree || school) {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xs font-bold">${degree}</h3>
+                        <span class="text-[10px] text-gray-500">${year}</span>
+                    </div>
+                    <p class="text-[11px] text-gray-700">${school}</p>
+                    ${grade ? `<p class="text-[10px] text-gray-500 italic">Score: ${grade}</p>` : ''}
+                `;
+                eduList.appendChild(div);
+            }
+        });
+
+        // Update Projects
+        const projList = document.getElementById('preview-projects');
+        projList.innerHTML = '';
+        document.querySelectorAll('#project-list .item-block').forEach(block => {
+            const title = block.querySelector('.input-proj-title').value;
+            const desc = block.querySelector('.input-proj-desc').value;
+
+            if (title || desc) {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <h3 class="text-xs font-bold mb-1">${title}</h3>
+                    <p class="text-[11px] text-gray-700 leading-relaxed">${desc}</p>
+                `;
+                projList.appendChild(div);
+            }
+        });
+    }
+
+    function addItem(type) {
+        const container = document.getElementById(type + '-list');
+        const div = document.createElement('div');
+        div.className = 'item-block bg-white/5 p-4 rounded-xl border border-white/10 relative group';
+
+        if (type === 'education') {
+            div.innerHTML = `
+                <input type="text" placeholder="Degree (e.g. B.Tech in IT)" class="input-degree w-full bg-transparent text-white font-bold mb-2 focus:outline-none">
+                <input type="text" placeholder="University Name" class="input-school w-full bg-transparent text-gray-400 text-sm mb-2 focus:outline-none">
+                <div class="flex gap-4">
+                    <input type="text" placeholder="Year (2020 - 2024)" class="input-year w-1/2 bg-transparent text-gray-500 text-xs focus:outline-none">
+                    <input type="text" placeholder="GPA / Percentage" class="input-grade w-1/2 bg-transparent text-gray-500 text-xs focus:outline-none">
+                </div>
+            `;
+        } else {
+            div.innerHTML = `
+                <input type="text" placeholder="Project Title" class="input-proj-title w-full bg-transparent text-white font-bold mb-2 focus:outline-none">
+                <textarea placeholder="Brief description..." class="input-proj-desc w-full bg-transparent text-gray-400 text-sm focus:outline-none" rows="2"></textarea>
+            `;
+        }
+
+        const delBtn = document.createElement('button');
+        delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        delBtn.className = 'absolute top-4 right-4 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition';
+        delBtn.onclick = () => { div.remove(); updatePreview(); };
+        div.appendChild(delBtn);
+
+        container.appendChild(div);
+
+        // Add event listeners to new inputs
+        div.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('input', updatePreview);
+        });
+    }
+
+    // Initialize listeners
+    document.querySelectorAll('input, textarea').forEach(input => {
+        input.addEventListener('input', updatePreview);
+    });
+
+    // Initial run
+    updatePreview();
+</script>
+{% endblock %}
