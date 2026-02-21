@@ -30,3 +30,9 @@ instance/
 .vscode/
 get-pip.py
 
+# Uploaded user files
+uploads/
+
+# Frontend dependencies
+frontend/node_modules/
+
