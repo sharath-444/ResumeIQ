@@ -38,28 +38,13 @@
                     <div class="mt-2 relative">
                         <select id="role" name="role"
                             class="w-full bg-black/40 border border-white/10 text-white px-5 py-4 rounded-xl focus:border-neon focus:ring-1 focus:ring-neon outline-none appearance-none transition cursor-pointer hover:bg-black/60">
-                            <option value="Frontend Developer">Frontend Developer</option>
-                            <option value="Backend Developer">Backend Developer</option>
-                            <option value="Full Stack Developer">Full Stack Developer</option>
-                            <option value="Software Engineer">Software Engineer</option>
-                            <option value="Web Developer">Web Developer</option>
-                            <option value="Mobile App Developer">Mobile App Developer</option>
-                            <option value="Data Scientist">Data Scientist</option>
-                            <option value="Machine Learning Engineer">Machine Learning Engineer</option>
-                            <option value="AI Engineer">AI Engineer</option>
-                            <option value="DevOps Engineer">DevOps Engineer</option>
-                            <option value="Cloud Engineer">Cloud Engineer</option>
-                            <option value="Site Reliability Engineer (SRE)">Site Reliability Engineer (SRE)</option>
-                            <option value="Cybersecurity Analyst">Cybersecurity Analyst</option>
-                            <option value="Penetration Tester">Penetration Tester</option>
-                            <option value="Blockchain Developer">Blockchain Developer</option>
-                            <option value="Embedded Systems Engineer">Embedded Systems Engineer</option>
-                            <option value="Game Developer">Game Developer</option>
-                            <option value="Database Administrator (DBA)">Database Administrator (DBA)</option>
-                            <option value="Data Engineer">Data Engineer</option>
-                            <option value="QA / Automation Test Engineer">QA / Automation Test Engineer</option>
-                            <option value="Network Engineer">Network Engineer</option>
-                            <option value="Systems Engineer">Systems Engineer</option>
+                            {% for category, roles in target_roles.items() %}
+                            <optgroup label="{{ category }}">
+                                {% for role in roles %}
+                                <option value="{{ role }}">{{ role }}</option>
+                                {% endfor %}
+                            </optgroup>
+                            {% endfor %}
                         </select>
                         <div
                             class="absolute right-5 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400">

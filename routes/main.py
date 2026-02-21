@@ -8,6 +8,7 @@ from models import db, Resume, ParsedData
 from utils.extractor import extract_text
 from utils.scorer import calculate_ats_score
 from utils.analyzer import parse_resume, analyze_skill_gap
+from utils.constants import TARGET_ROLES
 
 main = Blueprint('main', __name__)
 
@@ -15,7 +16,7 @@ main = Blueprint('main', __name__)
 @main.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', target_roles=TARGET_ROLES)
 
 
 
@@ -116,6 +117,19 @@ def upload_file():
 @login_required
 def result():
     return render_template('result.html')
+
+
+@main.route('/report/<int:resume_id>')
+@login_required
+def view_report(resume_id):
+    resume = Resume.query.get_or_404(resume_id)
+    
+    # Check permission: Only owner or admin can view
+    if current_user.role != 'admin' and resume.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+        
+    analysis_data = json.loads(resume.analysis_data) if resume.analysis_data else {}
+    return render_template('result.html', resume=resume, data=analysis_data)
 
 
 @main.route('/dashboard')
