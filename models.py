@@ -4,7 +4,6 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-
 class User(UserMixin, db.Model):
     __tablename__ = 'user'
 
