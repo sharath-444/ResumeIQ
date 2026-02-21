@@ -13,8 +13,10 @@ main = Blueprint('main', __name__)
 
 
 @main.route('/')
+@login_required
 def index():
     return render_template('index.html')
+
 
 
 @main.route('/upload', methods=['POST'])
@@ -43,7 +45,7 @@ def upload_file():
         # --- Extract & analyse ---
         text = extract_text(filepath)
         parsed_data = parse_resume(text)
-        score, breakdown, feedback = calculate_ats_score(parsed_data)
+        score, breakdown, feedback = calculate_ats_score(parsed_data, target_role)
         missing_skills = analyze_skill_gap(parsed_data['skills'], target_role)
         
         # Dynamic AI Tips
