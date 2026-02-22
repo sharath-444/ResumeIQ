@@ -55,11 +55,7 @@
 
 <script>
     function viewAnalysis(id) {
-        // In a real app, this would load the specific report. 
-        // For now, let's just redirect to the result page with the latest data in localstorage if it matches, 
-        // OR better, we should implement a View Report route. 
-        // Since we stored full JSON in DB, we could technically re-populate it.
-        alert("View Report feature would load specific ID: " + id + "\n(For MVP, please Scan New Resume)");
+        window.location.href = '/report/' + id;
     }
 </script>
 {% endblock %}

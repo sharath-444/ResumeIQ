@@ -128,16 +128,25 @@
                     </div>
                 </div>
 
-                <!-- AI Suggestions -->
-                <div class="gsap-box relative rounded-2xl p-1 bg-gradient-to-r from-neon/20 to-purple/20">
+                <!-- AI Narrative (shown when AI feedback is available) -->
+                <div id="aiNarrativeCard"
+                    class="gsap-box relative rounded-2xl p-1 bg-gradient-to-r from-neon/20 to-purple/20"
+                    style="display:none">
                     <div class="bg-black/90 p-6 rounded-2xl relative overflow-hidden h-full">
-                        <!-- Background decoration -->
                         <div class="absolute -top-10 -right-10 w-40 h-40 bg-purple/10 rounded-full blur-3xl"></div>
+                        <h3 class="text-xl font-bold text-white mb-3 relative z-10">🤖 AI Feedback</h3>
+                        <p id="aiNarrativeText" class="text-gray-300 relative z-10 leading-relaxed"></p>
+                    </div>
+                </div>
 
-                        <h3 class="text-xl font-bold text-white mb-4 relative z-10">🚀 AI Power Tip</h3>
+                <!-- AI Power Tips (static fallback) -->
+                <div id="staticTipCard"
+                    class="gsap-box relative rounded-2xl p-1 bg-gradient-to-r from-neon/20 to-purple/20">
+                    <div class="bg-black/90 p-6 rounded-2xl relative overflow-hidden h-full">
+                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-purple/10 rounded-full blur-3xl"></div>
+                        <h3 class="text-xl font-bold text-white mb-4 relative z-10">🚀 AI Power Tips</h3>
                         <p class="text-gray-300 mb-4 relative z-10">Enhance your bullet points using these high-impact
                             action verbs:</p>
-
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 relative z-10">
                             <button
                                 class="px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/5 rounded text-sm text-neon transition hover:scale-105 transform cursor-copy"
@@ -158,7 +167,110 @@
 </div>
 
 <script>
-    // Inject server-side data if available (for HR viewing past reports)
-    window.serverData = {% if data %}{ { data | tojson | safe } } {% else %} null{% endif %};
+    // Server-side data injected when viewing a historical report
+    window.serverData = {{ data | tojson | safe if data else 'null' }};
+
+    function populatePage(d) {
+        if (!d) return;
+
+        const sugg = d.suggestions || {};
+
+        // Role label
+        document.getElementById('targetRoleDisplay').textContent = d.role || '—';
+
+        // Score counter animation
+        const scoreEl = document.getElementById('scoreValue');
+        const circle = document.getElementById('scoreCircle');
+        const target = d.score || 0;
+        const circumference = 283;
+        let current = 0;
+        const step = Math.ceil(target / 60);
+        const timer = setInterval(() => {
+            current = Math.min(current + step, target);
+            scoreEl.textContent = current;
+            const offset = circumference - (current / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+            if (current >= target) clearInterval(timer);
+        }, 16);
+
+        // Score message
+        const msgEl = document.getElementById('scoreMessage');
+        if (target >= 80) msgEl.textContent = '✅ Excellent Match';
+        else if (target >= 60) msgEl.textContent = '⚡ Good — Room to Improve';
+        else msgEl.textContent = '⚠️ Needs Attention';
+
+        // Contact info
+        const details = d.details || {};
+        const contactEl = document.getElementById('contactInfoList');
+        contactEl.innerHTML = `
+            <div class="flex items-center gap-3 text-sm"><i class="fa-solid fa-user text-neon w-5"></i><span class="text-gray-300">${details.name || 'N/A'}</span></div>
+            <div class="flex items-center gap-3 text-sm"><i class="fa-solid fa-envelope text-purple w-5"></i><span class="text-gray-300">${details.email || 'N/A'}</span></div>
+            <div class="flex items-center gap-3 text-sm"><i class="fa-solid fa-phone text-green-400 w-5"></i><span class="text-gray-300">${details.phone || 'N/A'}</span></div>
+        `;
+
+        // Score breakdown chart
+        const breakdown = d.breakdown || {};
+        if (window.Chart && Object.keys(breakdown).length) {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(breakdown),
+                    datasets: [{
+                        data: Object.values(breakdown),
+                        backgroundColor: ['#00f3ff', '#bd00ff', '#22c55e', '#eab308', '#f87171'],
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { display: false } },
+                        y: { ticks: { color: '#9ca3af' }, grid: { color: '#ffffff10' }, max: 40 }
+                    }
+                }
+            });
+        }
+
+        // Found skills
+        const foundEl = document.getElementById('foundSkills');
+        (details.skills || []).forEach(s => {
+            foundEl.innerHTML += `<span class="px-3 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">${s}</span>`;
+        });
+
+        // Missing skills
+        const missEl = document.getElementById('missingSkills');
+        (sugg.missing_keywords || []).slice(0, 12).forEach(s => {
+            missEl.innerHTML += `<span class="px-3 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">${s}</span>`;
+        });
+
+        // Strengths
+        const strEl = document.getElementById('strengthsList');
+        (sugg.strengths || []).forEach(s => {
+            strEl.innerHTML += `<li class="flex items-start gap-2"><i class="fa-solid fa-check text-green-400 mt-0.5"></i>${s}</li>`;
+        });
+
+        // Improvements / weaknesses
+        const impEl = document.getElementById('improvementsList');
+        const improvements = (sugg.improvements || []).concat(sugg.weaknesses || []);
+        improvements.slice(0, 6).forEach(s => {
+            impEl.innerHTML += `<li class="flex items-start gap-2"><i class="fa-solid fa-angles-right text-red-400 mt-0.5"></i>${s}</li>`;
+        });
+
+        // AI Narrative
+        const narrative = sugg.ai_narrative || '';
+        if (narrative && sugg.ai_powered) {
+            document.getElementById('aiNarrativeText').textContent = narrative;
+            document.getElementById('aiNarrativeCard').style.display = 'block';
+            document.getElementById('staticTipCard').style.display = 'none';
+        }
+    }
+
+    // On page load: prefer server-injected data, fall back to localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+        const src = window.serverData || JSON.parse(localStorage.getItem('analysisData') || 'null');
+        populatePage(src);
+    });
 </script>
 {% endblock %}

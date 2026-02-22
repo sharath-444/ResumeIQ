@@ -8,15 +8,25 @@ from models import db, Resume, ParsedData
 from utils.extractor import extract_text
 from utils.scorer import calculate_ats_score
 from utils.analyzer import parse_resume, analyze_skill_gap
-from utils.constants import TARGET_ROLES
-
 main = Blueprint('main', __name__)
 
 
 @main.route('/')
 @login_required
 def index():
-    return render_template('index.html', target_roles=TARGET_ROLES)
+    try:
+        from utils.constants import TARGET_ROLES
+        target_roles = TARGET_ROLES
+    except ImportError:
+        target_roles = {
+            "Software Development": ["Frontend Developer", "Backend Developer", "Full Stack Developer", "Software Engineer"],
+            "Data & AI": ["Data Scientist", "Data Engineer", "Machine Learning Engineer"],
+            "Cloud & DevOps": ["DevOps Engineer", "Cloud Architect"],
+            "Design & Product": ["UI/UX Designer", "Product Manager"],
+            "Cybersecurity": ["Cybersecurity Analyst", "Security Engineer"],
+            "Testing": ["QA Engineer", "Automation Test Engineer"],
+        }
+    return render_template('index.html', target_roles=target_roles)
 
 
 
@@ -49,9 +59,24 @@ def upload_file():
         score, breakdown, feedback = calculate_ats_score(parsed_data, target_role)
         missing_skills = analyze_skill_gap(parsed_data['skills'], target_role)
         
-        # Dynamic AI Tips
+        # ── AI-powered feedback via OpenRouter ──────────────────────────────
+        from utils.ai_scorer import get_ai_feedback
         from utils.analyzer import generate_ai_tips
-        dynamic_tips = generate_ai_tips(parsed_data)
+        api_key = current_app.config.get('OPENROUTER_API_KEY', '')
+        ai_result = get_ai_feedback(
+            resume_text=parsed_data.get('text', ''),
+            target_role=target_role,
+            score=score,
+            breakdown=breakdown,
+            missing_skills=missing_skills,
+            api_key=api_key,
+        )
+
+        # Use AI tips when available, fall back to rule-based tips
+        if ai_result.get('ai_powered') and ai_result.get('tips'):
+            dynamic_tips = ai_result['tips']
+        else:
+            dynamic_tips = generate_ai_tips(parsed_data)
 
         suggestions = {
             'strengths': ([f"Found {len(parsed_data['skills'])} relevant skills."]
@@ -59,6 +84,8 @@ def upload_file():
             'weaknesses': feedback,
             'missing_keywords': missing_skills,
             'improvements': dynamic_tips,
+            'ai_narrative': ai_result.get('narrative', ''),
+            'ai_powered': ai_result.get('ai_powered', False),
         }
         if score > 80:
             suggestions['strengths'].append('Great ATS score!')
