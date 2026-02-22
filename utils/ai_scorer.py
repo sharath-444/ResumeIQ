@@ -99,7 +99,7 @@ def get_ai_feedback(
                 {"role": "user", "content": prompt},
             ],
             "max_tokens": 512,
-            "temperature": 0.6,
+            "temperature": 0,   # 0 = deterministic/greedy — same input → same output
         }
 
         try:

@@ -102,7 +102,7 @@ def extract_skills(text):
         if re.search(r'\b' + re.escape(skill) + r'\b', text):
             found_skills.append(skill.upper())
     
-    return list(set(found_skills))
+    return sorted(set(found_skills))  # sorted → deterministic order every run
 
 def analyze_skill_gap(found_skills, target_role):
     """

@@ -37,6 +37,10 @@ class Resume(db.Model):
     filepath = db.Column(db.String(512), nullable=True)   # path inside uploads/
     file_size = db.Column(db.Integer, nullable=True)       # bytes
 
+    # Content fingerprint: SHA-256 of the normalised extracted text.
+    # Used to detect duplicate uploads and serve cached results.
+    content_hash = db.Column(db.String(64), nullable=True, index=True)
+
     # Analysis results
     score = db.Column(db.Integer, nullable=False)
     role_applied = db.Column(db.String(100), nullable=False)

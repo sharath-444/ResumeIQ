@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_mail import Mail, Message
 from utils.decorators import admin_required
 from models import db, User, Resume, SMTPConfig
-from utils.constants import get_all_roles, TARGET_ROLES
+
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -38,6 +38,7 @@ def dashboard():
 @login_required
 @admin_required
 def candidates():
+    from utils.constants import get_all_roles, TARGET_ROLES
     role = request.args.get('role', 'All')
     score_min = request.args.get('score_min', 0, type=int)
     

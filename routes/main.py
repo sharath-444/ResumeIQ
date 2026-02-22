@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 import os
 import json
 import secrets
+import hashlib
 
 from models import db, Resume, ParsedData
 from utils.extractor import extract_text
@@ -53,8 +54,25 @@ def upload_file():
     file_size = os.path.getsize(filepath)
 
     try:
-        # --- Extract & analyse ---
+        # --- Extract text ---
         text = extract_text(filepath)
+
+        # ── Deduplication: SHA-256 of normalised text ────────────────────────
+        # If this user has already submitted the same resume for the same role,
+        # return the stored result immediately — no LLM call, no variance.
+        content_hash = hashlib.sha256(text.strip().lower().encode()).hexdigest()
+        cached_resume = Resume.query.filter_by(
+            user_id=current_user.id,
+            role_applied=target_role,
+            content_hash=content_hash,
+        ).order_by(Resume.created_at.desc()).first()
+
+        if cached_resume and cached_resume.analysis_data:
+            cached_result = json.loads(cached_resume.analysis_data)
+            cached_result['cached'] = True
+            return jsonify(cached_result)
+
+        # ── Full pipeline (first-time upload) ───────────────────────────────
         parsed_data = parse_resume(text)
         score, breakdown, feedback = calculate_ats_score(parsed_data, target_role)
         missing_skills = analyze_skill_gap(parsed_data['skills'], target_role)
@@ -107,6 +125,7 @@ def upload_file():
             score=score,
             role_applied=target_role,
             analysis_data=analysis_json,
+            content_hash=content_hash,   # store for future deduplication
         )
         db.session.add(resume_entry)
         db.session.flush()               # get resume_entry.id before committing
@@ -131,6 +150,7 @@ def upload_file():
             'details': parsed_data,
             'suggestions': suggestions,
             'role': target_role,
+            'cached': False,
         })
 
     except Exception as e:
