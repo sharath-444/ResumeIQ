@@ -1,5 +1,8 @@
 import os
 import secrets
+from dotenv import load_dotenv
+
+load_dotenv()  # Load variables from .env into environment
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -38,11 +41,8 @@ def create_app():
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # OpenRouter AI scoring
-    app.config['OPENROUTER_API_KEY'] = os.environ.get(
-        'OPENROUTER_API_KEY',
-        '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'
-    )
+    # OpenRouter AI scoring — key loaded from .env (never hardcoded)
+    app.config['OPENROUTER_API_KEY'] = os.environ.get('OPENROUTER_API_KEY', '')
     # Recommended pool settings for SQLite; safe for other engines too.
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_pre_ping': True,
