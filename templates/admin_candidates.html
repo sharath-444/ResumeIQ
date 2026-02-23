@@ -7,7 +7,13 @@
         <div class="flex justify-between items-end mb-10 border-b border-white/10 pb-6">
             <div>
                 <h1 class="text-3xl font-bold text-white mb-2"><span class="text-purple">Top</span> Candidates</h1>
-                <p class="text-gray-400">Filter and shortlist the best talent</p>
+                <p class="text-gray-400">
+                    {% if selected_batch %}
+                    Showing results for batch <span class="text-neon font-mono">{{ selected_batch }}</span>
+                    {% else %}
+                    Filter and shortlist the best talent
+                    {% endif %}
+                </p>
             </div>
             <a href="{{ url_for('admin.dashboard') }}"
                 class="text-gray-400 hover:text-white transition bg-white/5 border border-white/10 px-4 py-2 rounded-lg text-sm">
@@ -114,7 +120,13 @@
                         {% else %}
                         <tr>
                             <td colspan="6" class="px-6 py-12 text-center text-gray-500 italic">
+                                {% if not selected_batch and selected_role == 'All' and selected_score == 0 %}
+                                Start by <a href="{{ url_for('admin.upload') }}"
+                                    class="text-purple hover:underline">uploading a batch of resumes</a> to see ranked
+                                results.
+                                {% else %}
                                 No candidates match the current filters.
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

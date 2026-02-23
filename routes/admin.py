@@ -2,8 +2,16 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required
 from flask_mail import Mail, Message
 from utils.decorators import admin_required
-from models import db, User, Resume, SMTPConfig
+from models import db, User, Resume, SMTPConfig, ParsedData
 from utils.constants import get_all_roles, TARGET_ROLES
+import uuid
+import os
+import json
+from flask_login import current_user
+from utils.extractor import extract_text
+from utils.scorer import calculate_ats_score
+from utils.analyzer import parse_resume, analyze_skill_gap
+from flask import current_app
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -40,8 +48,16 @@ def dashboard():
 def candidates():
     role = request.args.get('role', 'All')
     score_min = request.args.get('score_min', 0, type=int)
+    batch_id = request.args.get('batch_id')
     
     query = Resume.query
+    
+    if batch_id:
+        query = query.filter_by(batch_id=batch_id)
+    elif role == 'All' and score_min == 0:
+        # If no filters and no batch, show empty or latest 5 with a message
+        # For now, let's show nothing if batch_id is not provided but requested filters are empty
+        query = query.filter(Resume.id == -1) # return empty
     
     if role != 'All':
         query = query.filter_by(role_applied=role)
@@ -59,7 +75,90 @@ def candidates():
                           roles=roles, 
                           target_roles=TARGET_ROLES,
                           selected_role=role,
-                          selected_score=score_min)
+                          selected_score=score_min,
+                          selected_batch=batch_id)
+
+@admin.route('/upload', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def upload():
+    if request.method == 'POST':
+        files = request.files.getlist('resumes')
+        target_role = request.form.get('role', 'Software Engineer')
+        
+        if not files or files[0].filename == '':
+            flash('No files selected', 'error')
+            return redirect(url_for('admin.upload'))
+            
+        batch_id = str(uuid.uuid4())[:8]
+        processed_count = 0
+        
+        for file in files:
+            if file and file.filename.lower().endswith(('.pdf', '.docx')):
+                import secrets
+                safe_name = secrets.token_hex(8) + '_' + file.filename
+                filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], safe_name)
+                file.save(filepath)
+                file_size = os.path.getsize(filepath)
+                
+                try:
+                    text = extract_text(filepath)
+                    parsed_data = parse_resume(text)
+                    score, breakdown, feedback = calculate_ats_score(parsed_data)
+                    missing_skills = analyze_skill_gap(parsed_data['skills'], target_role)
+                    
+                    from utils.analyzer import generate_ai_tips
+                    dynamic_tips = generate_ai_tips(parsed_data)
+
+                    suggestions = {
+                        'strengths': ([f"Found {len(parsed_data['skills'])} relevant skills."]
+                                      if parsed_data['skills'] else []),
+                        'weaknesses': feedback,
+                        'missing_keywords': missing_skills,
+                        'improvements': dynamic_tips,
+                    }
+                    
+                    analysis_json = json.dumps({
+                        'score': score,
+                        'breakdown': breakdown,
+                        'details': parsed_data,
+                        'suggestions': suggestions,
+                        'role': target_role,
+                    })
+
+                    resume_entry = Resume(
+                        user_id=current_user.id,
+                        filename=file.filename,
+                        filepath=safe_name,
+                        file_size=file_size,
+                        score=score,
+                        role_applied=target_role,
+                        analysis_data=analysis_json,
+                        batch_id=batch_id
+                    )
+                    db.session.add(resume_entry)
+                    db.session.flush()
+
+                    parsed_entry = ParsedData(
+                        resume_id=resume_entry.id,
+                        name=parsed_data.get('name'),
+                        email=parsed_data.get('email'),
+                        phone=parsed_data.get('phone'),
+                        skills=json.dumps(parsed_data.get('skills', [])),
+                        experience=json.dumps(parsed_data.get('experience', [])),
+                        education=json.dumps(parsed_data.get('education', [])),
+                        raw_text=text[:10000],
+                    )
+                    db.session.add(parsed_entry)
+                    processed_count += 1
+                except Exception as e:
+                    print(f"Error processing {file.filename}: {e}")
+                    
+        db.session.commit()
+        flash(f'Successfully processed {processed_count} resumes in batch {batch_id}', 'success')
+        return redirect(url_for('admin.candidates', batch_id=batch_id))
+        
+    return render_template('admin_upload.html', target_roles=TARGET_ROLES)
 
 @admin.route('/toggle_shortlist/<int:resume_id>')
 @login_required
