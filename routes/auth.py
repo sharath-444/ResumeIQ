@@ -1,10 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
-from flask_bcrypt import Bcrypt
 from models import db, User
+from app import bcrypt
 
 auth = Blueprint('auth', __name__)
-bcrypt = Bcrypt()
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
