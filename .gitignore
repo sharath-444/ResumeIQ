@@ -18,21 +18,27 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Environment files
 .env
+backend/.env
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Database
 instance/
-.idea/
-.vscode/
-get-pip.py
+backend/instance/
 
 # Uploaded user files
 uploads/
+backend/uploads/
+
+# Logs
+*.log
 
 # Frontend dependencies
 frontend/node_modules/
-

@@ -1,25 +1,57 @@
 # ResumeIQ 🚀
 
-ResumeIQ is a modern, AI-powered resume analyzer that helps job seekers optimize their resumes for Applicant Tracking Systems (ATS). It evaluates resumes for ATS compatibility, provides skill-gap insights, and offers improvement suggestions. The platform features role-based authentication with separate admin and user dashboards for managing and reviewing resume reports.
+ResumeIQ is a modern, AI-powered resume analyzer that helps job seekers optimize their resumes for Applicant Tracking Systems (ATS). It evaluates resumes for ATS compatibility, provides skill-gap insights, and offers improvement suggestions.
 
 ## Features
 
 - **📄 Multi-Format Support**: Upload PDF or DOCX resumes.
 - **⚡ Instant Analysis**: Basic NLP extracts contact info, skills, experience, and projects.
 - **🎯 Role-Based Scoring**: Select a target role (Frontend, Backend, DevOps, Data Science) for tailored feedback.
-- **📊 Visual Dashboard**: 
-    - Circular ATS Score Meter.
-    - Radar Chart for score breakdown.
-    - Skill Gap Analysis.
+- **📊 Visual Dashboard**: Circular ATS Score Meter, Radar Chart, Skill Gap Analysis.
 - **💡 Smart Suggestions**: Actionable feedback and "Power Verb" recommendations.
 - **🔐 Secure Access**: Role-based authentication (User/Admin) and secure data handling.
 
 ## Tech Stack
 
-- **Backend**: Python, Flask, SQLAlchemy, Flask-Login
-- **Frontend**: HTML5, TailwindCSS (CDN), JavaScript
+- **Backend**: Python, Flask, SQLAlchemy, Flask-Login, OpenRouter AI
+- **Frontend**: HTML5, CSS, JavaScript, Chart.js (Served by Flask)
 - **Parsing**: PyPDF2, python-docx
-- **Charts**: Chart.js
+
+## Project Structure
+
+```
+resumeiq/
+├── backend/                 # ── Backend (Python / Flask)
+│   ├── run.py               # Entry point → python backend/run.py
+│   ├── app.py               # Flask app factory
+│   ├── models.py            # SQLAlchemy models
+│   ├── requirements.txt     # Python dependencies
+│   ├── .env                 # Secrets (gitignored)
+│   ├── routes/
+│   │   ├── auth.py          # Login / register / logout
+│   │   ├── main.py          # Upload, dashboard, report
+│   │   └── admin.py         # Admin panel
+│   ├── utils/
+│   │   ├── ai_scorer.py     # OpenRouter AI feedback
+│   │   ├── analyzer.py      # Resume parsing & skill-gap
+│   │   ├── scorer.py        # ATS scoring algorithm
+│   │   ├── extractor.py     # PDF/DOCX text extraction
+│   │   ├── constants.py     # Role & skill constants
+│   │   └── decorators.py    # @admin_required decorator
+│   ├── scripts/             # Utility / debug scripts
+│   ├── instance/            # SQLite DB (gitignored)
+│   └── uploads/             # Uploaded resumes (gitignored)
+│
+├── frontend/                # ── Frontend (Templates & Static)
+│   ├── templates/           # Jinja2 HTML templates
+│   └── static/
+│       ├── css/
+│       └── js/
+│
+├── .env.example             # Template for environment variables
+├── .gitignore
+└── README.md
+```
 
 ## Installation
 
@@ -34,46 +66,24 @@ ResumeIQ is a modern, AI-powered resume analyzer that helps job seekers optimize
    ```
 3. **Install dependencies**:
    ```bash
-   pip install -r requirements.txt
+   pip install -r backend/requirements.txt
    ```
-
-## Usage
-
-1. **Run the application**:
+4. **Configure environment variables**:
    ```bash
-   python app.py
+   copy .env.example backend\.env   # Windows
+   # cp .env.example backend/.env   # Mac/Linux
+   # Then edit backend/.env and set OPENROUTER_API_KEY and SECRET_KEY
    ```
-2. **Open your browser**:
-   Navigate to `http://127.0.0.1:5000`
-3. **Analyze**:
-   - Register/Login to access the dashboard.
-   - Select your target role.
-   - Drag and drop your resume.
-   - View your simplified ATS report!
 
-## Project Structure
+## Running the App
 
+```bash
+python backend/run.py
 ```
-ResumeIQ/
-├── app.py              # Flask application entry point
-├── requirements.txt    # Python dependencies
-├── static/
-│   ├── css/
-│   │   └── style.css   # Custom animations
-│   └── js/
-│       └── script.js   # Frontend logic & Chart.js
-├── templates/
-│   ├── base.html       # Base layout
-│   ├── index.html      # Landing & Upload page
-│   ├── dashboard.html  # User Dashboard
-│   ├── register.html   # Registration Page
-│   └── login.html      # Login Page
-│   └── result.html     # Analysis Dashboard
-└── utils/
-    ├── analyzer.py     # Skill gap & suggestion logic
-    ├── extractor.py    # Text extraction (PDF/DOCX)
-    └── scorer.py       # ATS scoring algorithm
-```
+
+Open your browser at `http://127.0.0.1:5000`
+
+**Default admin account**: username `admin` / password `password123`
 
 ## License
 

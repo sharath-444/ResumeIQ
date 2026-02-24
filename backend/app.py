@@ -2,7 +2,9 @@ import os
 import secrets
 from dotenv import load_dotenv
 
-load_dotenv()  # Load variables from .env into environment
+# Load .env from the server/ directory (where this file lives)
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -20,22 +22,29 @@ migrate = Migrate()
 
 
 def create_app():
-    app = Flask(__name__)
+    # Point Flask at the client/ folder for templates and static files
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    CLIENT_DIR = os.path.join(BASE_DIR, '..', 'frontend')
+
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(CLIENT_DIR, 'templates'),
+        static_folder=os.path.join(CLIENT_DIR, 'static'),
+    )
 
     # ------------------------------------------------------------------
     # Configuration
     # ------------------------------------------------------------------
-    # Use environment variable in production; fall back to a fixed dev key.
     app.config['SECRET_KEY'] = os.environ.get(
         'SECRET_KEY', 'dev-secret-key-resumeiq-do-not-use-in-prod'
     )
 
-    # File uploads
-    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'uploads')
+    # File uploads — stored inside server/uploads/
+    app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'uploads')
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
 
-    # Database — SQLite stored inside the Flask 'instance/' folder
-    db_path = os.path.join(app.instance_path, 'resumeiq.db')
+    # Database — SQLite stored inside server/instance/
+    db_path = os.path.join(BASE_DIR, 'instance', 'resumeiq.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = (
         os.environ.get('DATABASE_URL') or f'sqlite:///{db_path}'
     )
@@ -43,6 +52,7 @@ def create_app():
 
     # OpenRouter AI scoring — key loaded from .env (never hardcoded)
     app.config['OPENROUTER_API_KEY'] = os.environ.get('OPENROUTER_API_KEY', '')
+
     # Recommended pool settings for SQLite; safe for other engines too.
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_pre_ping': True,
@@ -52,7 +62,7 @@ def create_app():
     # Ensure required directories exist
     # ------------------------------------------------------------------
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    os.makedirs(app.instance_path, exist_ok=True)
+    os.makedirs(os.path.join(BASE_DIR, 'instance'), exist_ok=True)
 
     # ------------------------------------------------------------------
     # Initialise extensions
@@ -105,8 +115,3 @@ def create_app():
             print('[DB] Default admin user created (username=admin, password=password123)')
 
     return app
-
-
-if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True, use_reloader=True)
