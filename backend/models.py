@@ -46,6 +46,7 @@ class Resume(db.Model):
     role_applied = db.Column(db.String(100), nullable=False)
     analysis_data = db.Column(db.Text, nullable=True)      # full JSON blob
     is_shortlisted = db.Column(db.Boolean, default=False)
+    batch_id = db.Column(db.String(100), nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
