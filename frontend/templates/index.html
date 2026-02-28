@@ -1,100 +1,1101 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="relative min-h-screen flex items-center justify-center overflow-hidden py-8">
-    <!-- Particles Background -->
-    <div id="particles-js"></div>
+<style>
+    /* Base custom utilities & aesthetics */
+    .bg-glass {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
 
-    <!-- Hero Content -->
-    <div class="relative z-10 max-w-4xl w-full px-4 text-center mt-4">
+    .bg-glass-heavy {
+        background: rgba(10, 15, 30, 0.5);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-        <div class="gsap-hero opacity-0 translate-y-10">
-            <span
-                class="inline-block py-1 px-3 rounded-full bg-white/5 border border-white/10 text-neon text-xs tracking-widest uppercase mb-3 backdrop-blur-md">
-                AI-Powered ATS Analysis
-            </span>
-            <h1 class="text-4xl md:text-6xl font-bold mb-3 tracking-tight leading-tight">
-                Optimize Your <br>
-                <span class="text-gradient">Career Impact</span>
-            </h1>
-            <p class="text-base text-gray-400 mb-6 max-w-2xl mx-auto font-light">
-                Unlock your resume's potential with cinematic AI analysis. Get an instant score, detailed breakdown, and
-                actionable feedback.
-            </p>
+    /* Neons */
+    .text-neon-cyan {
+        color: #00f3ff;
+    }
+
+    .text-neon-violet {
+        color: #bd00ff;
+    }
+
+    .bg-neon-cyan {
+        background-color: #00f3ff;
+    }
+
+    .bg-neon-violet {
+        background-color: #bd00ff;
+    }
+
+    .glow-cyan-text {
+        text-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
+    }
+
+    /* Mesh Background */
+    .mesh-bg {
+        background-image:
+            radial-gradient(at 0% 0%, rgba(10, 15, 35, 1) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(5, 5, 20, 1) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(20, 10, 40, 0.8) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(5, 10, 25, 1) 0px, transparent 50%);
+        background-color: #020617;
+        /* dark slate */
+    }
+
+    /* Orbs */
+    .bg-orb-1 {
+        background: radial-gradient(circle, rgba(0, 243, 255, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+    }
+
+    .bg-orb-2 {
+        background: radial-gradient(circle, rgba(189, 0, 255, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #030712;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #1e293b;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #334155;
+    }
+
+    /* ATS Circular Progress */
+    .circular-chart {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        max-height: 250px;
+    }
+
+    .circle-bg {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.03);
+        stroke-width: 2.0;
+    }
+
+    .circle {
+        fill: none;
+        stroke-width: 2.0;
+        stroke-linecap: round;
+    }
+
+    /* Animations */
+    @keyframes shimmer {
+        100% {
+            transform: translateX(100%) skewX(-20deg);
+        }
+    }
+
+    .animate-shimmer {
+        animation: shimmer 1.5s infinite;
+    }
+</style>
+
+<!-- Particles Background (From script.js) -->
+<div id="particles-js" class="fixed inset-0 z-0 pointer-events-none opacity-40"></div>
+
+<!-- React Root -->
+<div id="root" class="relative z-10 w-full min-h-screen text-gray-200 mesh-bg overflow-x-hidden"></div>
+
+<!-- Terminal Loader (Kept outside React for compatibility and ease of native DOM manipulation) -->
+<div id="terminalLoader"
+    class="terminal-screen hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center backdrop-blur-sm">
+    <div
+        class="terminal-content bg-[#0a0a0a] border border-white/10 p-8 rounded-2xl w-full max-w-2xl font-mono shadow-[0_0_50px_rgba(0,243,255,0.15)]">
+        <div class="mb-6 text-xs text-gray-500 border-b border-white/5 pb-4 flex justify-between items-center">
+            <span class="flex items-center"><i class="fa-solid fa-terminal text-neon-cyan mr-2"></i> RESUME-IQ CORE
+                v3.0</span>
+            <span class="text-neon-cyan animate-pulse">STATUS: PROCESSING</span>
         </div>
-
-        <!-- Upload Card -->
-        <div
-            class="gsap-card opacity-0 scale-95 glass-panel rounded-3xl p-6 max-w-2xl mx-auto relative overflow-hidden group">
-            <!-- Glow Effect -->
-            <div
-                class="absolute inset-0 bg-gradient-to-r from-neon/10 to-purple/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-            </div>
-
-            <form id="uploadForm" class="relative z-10">
-                <div class="mb-4 text-left">
-                    <label class="text-sm font-semibold text-gray-400 ml-2 uppercase tracking-wide">Select Target
-                        Role</label>
-                    <div class="mt-2 relative">
-                        <select id="role" name="role"
-                            class="w-full bg-black/40 border border-white/10 text-white px-5 py-4 rounded-xl focus:border-neon focus:ring-1 focus:ring-neon outline-none appearance-none transition cursor-pointer hover:bg-black/60">
-                            {% for category, roles in target_roles.items() %}
-                            <optgroup label="{{ category }}">
-                                {% for role in roles %}
-                                <option value="{{ role }}">{{ role }}</option>
-                                {% endfor %}
-                            </optgroup>
-                            {% endfor %}
-                        </select>
-                        <div
-                            class="absolute right-5 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400">
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="dropZone"
-                    class="border-2 border-dashed border-white/20 rounded-2xl p-8 cursor-pointer transition-all duration-300 hover:border-neon hover:bg-white/5 group-hover:scale-[1.01]">
-                    <input type="file" id="resumeFile" name="resume" class="hidden" accept=".pdf,.docx">
-                    <div class="flex flex-col items-center justify-center space-y-4">
-                        <div
-                            class="w-14 h-14 bg-gradient-to-br from-gray-800 to-black rounded-2xl flex items-center justify-center text-2xl text-white shadow-2xl group-hover:shadow-[0_0_30px_rgba(0,243,255,0.3)] transition-all duration-500">
-                            <i class="fa-solid fa-cloud-arrow-up text-gradient"></i>
-                        </div>
-                        <div class="text-center">
-                            <span class="block text-xl font-medium text-white mb-1">Drag & Drop Resume</span>
-                            <span class="text-sm text-gray-500">Supported Formats: PDF, DOCX</span>
-                        </div>
-                        <div id="fileName"
-                            class="text-neon text-sm font-medium mt-2 opacity-0 transform translate-y-2 transition-all duration-300">
-                        </div>
-                    </div>
-                </div>
-
-                <div id="actionArea" class="mt-4 transition-all duration-500 max-h-0 overflow-hidden opacity-0">
-                    <button type="submit"
-                        class="w-full bg-white text-black font-bold text-base py-3 rounded-xl hover:bg-neon hover:text-black transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(0,243,255,0.6)] transform hover:-translate-y-1">
-                        Analyze Now <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Terminal Loading Screen -->
-<div id="terminalLoader" class="terminal-screen">
-    <div class="terminal-content">
-        <div class="mb-4 text-xs text-gray-500 border-b border-gray-800 pb-2 flex justify-between">
-            <span>RESUME-IQ TERMINAL v2.0</span>
-            <span>STATUS: PROCESSING</span>
-        </div>
-        <div id="terminalLines" class="space-y-2">
+        <div id="terminalLines" class="space-y-3 h-[250px] overflow-y-auto text-sm text-gray-300 pr-2 pb-4">
             <!-- Lines injected by JS -->
         </div>
-        <div class="mt-4 h-1 w-full bg-gray-900 rounded overflow-hidden">
-            <div id="progressBar" class="h-full bg-neon w-0"></div>
+        <div class="mt-6 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+            <div id="progressBar"
+                class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 w-0 transition-all duration-300 relative shadow-[0_0_10px_rgba(0,243,255,0.5)]">
+                <div
+                    class="absolute top-0 bottom-0 left-0 right-0 bg-white/20 w-8 blur-sm animate-[shimmer_1s_infinite]">
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Load React, ReactDOM, Framer Motion, Babel -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    const { motion, AnimatePresence, useScroll, useTransform } = window.Motion;
+
+    const TARGET_ROLES = {{ target_roles | tojson | safe if target_roles else '{}' }};
+
+    {% raw %}
+    // ----- COMPONENTS -----
+
+    // 1. Animated Background Extras
+    const AnimatedBackground = () => {
+        const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+        useEffect(() => {
+            const handleMouseMove = (e) => {
+                setMousePos({
+                    x: (e.clientX - window.innerWidth / 2) * 0.02,
+                    y: (e.clientY - window.innerHeight / 2) * 0.02,
+                });
+            };
+            window.addEventListener('mousemove', handleMouseMove);
+            return () => window.removeEventListener('mousemove', handleMouseMove);
+        }, []);
+
+        return (
+            <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 bg-[#070b14]">
+                {/* 1. Animated Gradient Base (Midnight / Slate / Electric Blue) */}
+                <motion.div
+                    className="absolute inset-0 bg-gradient-to-br from-[#0A0F1F] via-[#111827] to-[#0A0F1F] opacity-90"
+                    animate={{ backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
+                    transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
+                    style={{ backgroundSize: "200% 200%" }}
+                />
+
+                {/* 5. Depth & Parallax Wrapper for subtle elements */}
+                <motion.div
+                    className="absolute inset-0 w-full h-full"
+                    animate={{ x: -mousePos.x, y: -mousePos.y }}
+                    transition={{ type: "spring", stiffness: 40, damping: 20 }}
+                >
+                    {/* 4. Corner Glow Effects (Soft Blues instead of Purple/Cyan) */}
+                    <motion.div
+                        className="absolute -top-[10%] -right-[5%] w-[60vw] h-[60vw] rounded-full bg-[#3B82F6]/10 blur-[130px]"
+                        animate={{ opacity: [0.15, 0.3, 0.15] }}
+                        transition={{ duration: 35, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <motion.div
+                        className="absolute -bottom-[10%] -left-[5%] w-[50vw] h-[50vw] rounded-full bg-[#60A5FA]/10 blur-[120px]"
+                        animate={{ opacity: [0.15, 0.4, 0.15] }}
+                        transition={{ duration: 45, repeat: Infinity, ease: "easeInOut", delay: 5 }}
+                    />
+
+                    {/* 2. Neural Network Animation (Subtle flowing infrastructure - matching blues) */}
+                    <div className="absolute inset-0 opacity-15">
+                        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <motion.g
+                                animate={{ x: [-15, 15, -15], y: [-10, 10, -10] }}
+                                transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                                <path d="M 10 10 L 150 200 L 400 150 L 550 400 L 800 300" stroke="rgba(59, 130, 246, 0.4)" strokeWidth="0.5" fill="none" />
+                                <path d="M 200 500 L 350 400 L 600 600 L 850 450" stroke="rgba(96, 165, 250, 0.4)" strokeWidth="0.5" fill="none" />
+                                <path d="M 150 200 L 200 500" stroke="rgba(59, 130, 246, 0.2)" strokeWidth="0.5" fill="none" strokeDasharray="5,5" />
+                                <path d="M 400 150 L 600 600" stroke="rgba(96, 165, 250, 0.2)" strokeWidth="0.5" fill="none" strokeDasharray="5,5" />
+                                <path d="M 550 400 L 850 450" stroke="rgba(59, 130, 246, 0.2)" strokeWidth="0.5" fill="none" strokeDasharray="5,5" />
+
+                                {/* Pulse Nodes */}
+                                {[
+                                    { cx: 150, cy: 200, color: "59, 130, 246" },
+                                    { cx: 400, cy: 150, color: "96, 165, 250" },
+                                    { cx: 550, cy: 400, color: "59, 130, 246" },
+                                    { cx: 800, cy: 300, color: "96, 165, 250" },
+                                    { cx: 200, cy: 500, color: "59, 130, 246" },
+                                    { cx: 350, cy: 400, color: "96, 165, 250" },
+                                    { cx: 600, cy: 600, color: "59, 130, 246" },
+                                    { cx: 850, cy: 450, color: "96, 165, 250" }
+                                ].map((node, i) => (
+                                    <motion.circle
+                                        key={i} cx={node.cx} cy={node.cy} r="2.5"
+                                        fill={`rgba(${node.color}, 0.8)`}
+                                        animate={{ scale: [1, 1.05, 1], opacity: [0.4, 0.8, 0.4] }}
+                                        transition={{ duration: 4 + (i % 3), repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
+                                    />
+                                ))}
+                            </motion.g>
+                            <motion.g
+                                animate={{ x: [10, -10, 10], y: [5, -5, 5] }}
+                                transition={{ duration: 30, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                            >
+                                <path d="M 700 800 L 900 650 L 1100 750" stroke="rgba(96, 165, 250, 0.4)" strokeWidth="0.5" fill="none" />
+                                <path d="M 900 650 L 1200 450" stroke="rgba(59, 130, 246, 0.3)" strokeWidth="0.5" fill="none" strokeDasharray="5,5" />
+                                {[
+                                    { cx: 700, cy: 800, color: "96, 165, 250" },
+                                    { cx: 900, cy: 650, color: "59, 130, 246" },
+                                    { cx: 1100, cy: 750, color: "96, 165, 250" },
+                                    { cx: 1200, cy: 450, color: "59, 130, 246" }
+                                ].map((node, i) => (
+                                    <motion.circle
+                                        key={`g2-${i}`} cx={node.cx} cy={node.cy} r="2.5"
+                                        fill={`rgba(${node.color}, 0.8)`}
+                                        animate={{ scale: [1, 1.05, 1], opacity: [0.4, 0.8, 0.4] }}
+                                        transition={{ duration: 4 + (i % 3), repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
+                                    />
+                                ))}
+                            </motion.g>
+                        </svg>
+                    </div>
+
+                    {/* 3. Floating Mesh Effect (Soft geometric lines appearing randomly) */}
+                    <div className="absolute inset-0 opacity-[0.03]">
+                        {[...Array(5)].map((_, i) => (
+                            <motion.div
+                                key={`mesh-${i}`}
+                                className="absolute border border-white rounded-full"
+                                style={{
+                                    width: 300 + i * 200,
+                                    height: 300 + i * 200,
+                                    top: `${20 + Math.random() * 60}%`,
+                                    left: `${20 + Math.random() * 60}%`,
+                                    transform: 'translate(-50%, -50%)',
+                                }}
+                                animate={{
+                                    opacity: [0, 1, 0],
+                                    scale: [0.95, 1.05, 0.95]
+                                }}
+                                transition={{
+                                    duration: 20 + i * 5,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: i * 3
+                                }}
+                            />
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* 6. Light Sweep Effect */}
+                <motion.div
+                    className="absolute top-0 bottom-0 w-[800px] bg-gradient-to-r from-transparent via-white/[0.03] to-transparent blur-[80px] transform -skew-x-[40deg]"
+                    animate={{ left: ["-100vw", "200vw"] }}
+                    transition={{ duration: 6, ease: "easeInOut", repeat: Infinity, repeatDelay: 12 }}
+                />
+            </div>
+        );
+    };
+
+    // 2. Hero Section
+    const HeroSection = () => {
+        const [role, setRole] = useState('candidate');
+        const [selectedRoleValue, setSelectedRoleValue] = useState('');
+        const [selectedFile, setSelectedFile] = useState(null);
+        const fileInputRef = useRef(null);
+
+        // Smooth Parallax
+        const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+        useEffect(() => {
+            const handleMouseMove = (e) => {
+                setMousePos({
+                    x: (e.clientX - window.innerWidth / 2) * 0.015,
+                    y: (e.clientY - window.innerHeight / 2) * 0.015,
+                });
+            };
+            window.addEventListener('mousemove', handleMouseMove);
+            return () => window.removeEventListener('mousemove', handleMouseMove);
+        }, []);
+
+        // Re-implemented custom fetch logic for form submit to avoid relying on script.js order
+        const playTerminalReact = () => {
+            return new Promise((resolve) => {
+                const linesContainer = document.getElementById('terminalLines');
+                const progressBar = document.getElementById('progressBar');
+                if (!linesContainer) return resolve();
+
+                linesContainer.innerHTML = '';
+                progressBar.style.width = '0%';
+
+                const tasks = [
+                    "Initializing secure AI environment...",
+                    "Reading document structure & layout...",
+                    "Extracting entity data (Experience, Education)...",
+                    "Parsing employment history nuances...",
+                    "Identifying hard and soft skill keywords...",
+                    "Matching target role requirements against dataset...",
+                    "Calculating ATS compatibility density matrix...",
+                    "Compiling actionable final report..."
+                ];
+
+                let delay = 0;
+                const lineSpeed = 500;
+
+                tasks.forEach((task, index) => {
+                    setTimeout(() => {
+                        const p = document.createElement('div');
+                        p.className = 'opacity-0 transition-opacity duration-300';
+                        p.innerHTML = `<span class="text-neon-cyan mr-2">></span> ${task}`;
+                        linesContainer.appendChild(p);
+
+                        // Trigger reflow & fade in
+                        void p.offsetWidth;
+                        p.classList.remove('opacity-0');
+
+                        const progress = ((index + 1) / tasks.length) * 100;
+                        progressBar.style.width = `${progress}%`;
+                        linesContainer.scrollTop = linesContainer.scrollHeight;
+                    }, delay);
+                    delay += lineSpeed;
+                });
+
+                setTimeout(resolve, delay + 800);
+            });
+        };
+
+        const handleFormSubmit = async (e) => {
+            e.preventDefault();
+
+            if (!selectedFile) {
+                alert("Please select a resume file first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('resume', selectedFile);
+            formData.append('role', selectedRoleValue || 'Full Stack Developer'); // Fallback
+
+            const terminal = document.getElementById('terminalLoader');
+            if (terminal) terminal.classList.remove('hidden');
+
+            try {
+                const apiRequest = fetch('/upload', { method: 'POST', body: formData });
+
+                await playTerminalReact();
+                const response = await apiRequest;
+
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") === -1) {
+                    if (response.status === 401 || response.status === 403 || response.url.includes('/login')) {
+                        alert('Session expired. Please log in again.');
+                        window.location.href = '/auth/login';
+                        return;
+                    }
+                    throw new Error("Received non-JSON response");
+                }
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('resumeAnalysis', JSON.stringify(data));
+                    window.location.href = '/result';
+                } else {
+                    alert(data.error || 'Upload failed');
+                    if (terminal) terminal.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Upload Error:', error);
+                alert('An error occurred during upload. Please check console.');
+                if (terminal) terminal.classList.add('hidden');
+            }
+        };
+
+        return (
+            <section className="relative z-10 flex flex-col items-center justify-center pt-24 pb-12 px-6 min-h-[80vh]">
+
+                <motion.div
+                    className="flex items-center space-x-1 bg-[#111827]/80 rounded-full p-1.5 mb-8 border border-white/5 shadow-2xl backdrop-blur-xl"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
+                >
+                    <button
+                        onClick={() => setRole('candidate')}
+                        className={`px-8 py-2.5 rounded-full text-sm font-semibold transition-all duration-500 ease-out ${role === 'candidate' ? 'bg-[#3B82F6]/20 text-white shadow-[0_0_20px_rgba(59,130,246,0.2)] border border-[#3B82F6]/30' : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'}`}
+                    >
+                        I'm a Candidate
+                    </button>
+                    <button
+                        onClick={() => setRole('recruiter')}
+                        className={`px-8 py-2.5 rounded-full text-sm font-semibold transition-all duration-500 ease-out ${role === 'recruiter' ? 'bg-[#3B82F6]/20 text-white shadow-[0_0_20px_rgba(59,130,246,0.2)] border border-[#3B82F6]/30' : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'}`}
+                    >
+                        I'm a Recruiter
+                    </button>
+                </motion.div>
+
+                <motion.div
+                    className="text-center max-w-5xl mx-auto w-full"
+                    style={{ x: mousePos.x, y: mousePos.y }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
+                >
+                    <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-5xl font-extrabold tracking-tight mb-4 leading-tight text-white drop-shadow-2xl">
+                        Smarter Resumes. <br className="hidden md:block" />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                            Smarter Hiring.
+                        </span>
+                    </h1>
+                    <p className="text-base md:text-lg text-gray-400 font-light max-w-2xl mx-auto mb-8 leading-relaxed">
+                        AI-powered ATS scoring for candidates and intelligent candidate matching for recruiters.
+                        Experience the premium standard of talent acquisition.
+                    </p>
+
+                    <AnimatePresence mode="wait">
+                        {role === 'candidate' ? (
+                            <motion.div
+                                key="candidate-card"
+                                initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -20, scale: 0.98 }}
+                                transition={{ duration: 0.5, ease: "easeOut" }}
+                                className="bg-glass-heavy border border-white/5 p-6 md:p-8 rounded-[2rem] max-w-xl mx-auto shadow-2xl relative overflow-hidden group"
+                            >
+                                {/* Hover glow */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+
+                                <form onSubmit={handleFormSubmit} className="relative z-10 flex flex-col items-center w-full">
+
+                                    <div className="w-12 h-12 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+                                        <i className="fa-solid fa-cloud-arrow-up text-2xl text-[#60A5FA] drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]"></i>
+                                    </div>
+
+                                    <h3 className="text-xl font-semibold text-white mb-1">Upload Your Resume</h3>
+                                    <p className="text-xs text-gray-400 mb-6">PDF or DOCX format</p>
+
+                                    <div className="w-full relative mb-4">
+                                        <label className="block text-xs uppercase tracking-widest text-gray-500 font-semibold mb-2 text-left ml-2">Target Role</label>
+                                        <select
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-cyan-500/50 appearance-none cursor-pointer transition-colors hover:bg-black/60 shadow-inner"
+                                            value={selectedRoleValue}
+                                            onChange={(e) => setSelectedRoleValue(e.target.value)}
+                                            required
+                                        >
+                                            <option value="" disabled>Select Target Role</option>
+                                            {Object.keys(TARGET_ROLES).map(cat => (
+                                                <optgroup key={cat} label={cat} className="bg-[#111827] text-[#60A5FA] font-bold">
+                                                    {TARGET_ROLES[cat].map(r => (
+                                                        <option key={r} value={r} className="text-white font-normal">{r}</option>
+                                                    ))}
+                                                </optgroup>
+                                            ))}
+                                        </select>
+                                        <div className="absolute right-5 top-[2.4rem] pointer-events-none text-gray-400">
+                                            <i className="fa-solid fa-chevron-down text-xs"></i>
+                                        </div>
+                                    </div>
+
+                                    <input
+                                        type="file"
+                                        className="hidden"
+                                        accept=".pdf,.docx"
+                                        ref={fileInputRef}
+                                        onChange={(e) => setSelectedFile(e.target.files[0])}
+                                    />
+
+                                    <div
+                                        className={`w-full border-2 border-dashed rounded-xl p-4 transition-all duration-300 cursor-pointer mb-5 flex flex-col items-center justify-center group/drop ${selectedFile ? 'border-[#3B82F6]/50 bg-[#3B82F6]/5' : 'border-white/10 hover:border-[#3B82F6]/30 hover:bg-[#3B82F6]/5'}`}
+                                        onClick={() => fileInputRef.current?.click()}
+                                    >
+                                        {selectedFile ? (
+                                            <div className="flex items-center text-[#60A5FA] font-medium">
+                                                <i className="fa-solid fa-file-invoice text-xl mr-3"></i>
+                                                {selectedFile.name}
+                                            </div>
+                                        ) : (
+                                            <div className="text-gray-400 flex items-center">
+                                                <i className="fa-solid fa-file-arrow-up text-lg mr-2 group-hover/drop:text-[#60A5FA] transition-colors"></i>
+                                                Click to browse files
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="w-full py-3 rounded-xl bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] text-white font-bold text-base shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group/btn"
+                                    >
+                                        <span className="relative z-10 flex items-center justify-center pt-0.5">
+                                            Analyze Resume <i className="fa-solid fa-wand-magic-sparkles ml-2 text-sm"></i>
+                                        </span>
+                                        <div className="absolute top-0 bottom-0 left-[-100%] w-1/2 bg-white/20 transform skew-x-[-20deg] group-hover/btn:animate-[shimmer_1s_infinite]"></div>
+                                    </button>
+                                </form>
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="recruiter-card"
+                                initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -20, scale: 0.98 }}
+                                transition={{ duration: 0.5, ease: "easeOut" }}
+                                style={{
+                                    transform: `translate(${mousePos.x * 0.05}px, ${mousePos.y * 0.05}px)`
+                                }}
+                                className="bg-glass-heavy border border-white/5 p-6 md:p-8 rounded-[2rem] max-w-xl mx-auto shadow-2xl relative overflow-hidden group min-h-[400px] flex items-center justify-center"
+                            >
+                                {/* 1. Base Layer: Deep navy to midnight gradient with mesh movement */}
+                                <motion.div
+                                    className="absolute inset-0 z-0 bg-gradient-to-br from-[#0b132b] via-[#1c2541] to-[#0b132b] opacity-90"
+                                    animate={{
+                                        backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"]
+                                    }}
+                                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                                    style={{ backgroundSize: "200% 200%" }}
+                                />
+
+                                {/* 2. Neural Network Overlay (SVG) */}
+                                <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
+                                    <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                                        <motion.g
+                                            animate={{ x: [-10, 10, -10], y: [-5, 5, -5] }}
+                                            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                                        >
+                                            <path d="M50 50 L150 120" stroke="rgba(0, 243, 255, 0.4)" strokeWidth="1" fill="none" />
+                                            <path d="M150 120 L250 80" stroke="rgba(189, 0, 255, 0.4)" strokeWidth="1" fill="none" />
+                                            <path d="M250 80 L350 150" stroke="rgba(0, 243, 255, 0.4)" strokeWidth="1" fill="none" />
+                                            <path d="M350 150 L450 60" stroke="rgba(189, 0, 255, 0.4)" strokeWidth="1" fill="none" />
+                                            <path d="M150 120 L200 200" stroke="rgba(0, 243, 255, 0.4)" strokeWidth="1" fill="none" />
+                                            <path d="M250 80 L300 20" stroke="rgba(189, 0, 255, 0.4)" strokeWidth="1" fill="none" />
+                                            <path d="M350 150 L300 250" stroke="rgba(0, 243, 255, 0.4)" strokeWidth="1" fill="none" />
+
+                                            <motion.circle cx="50" cy="50" r="3" fill="rgba(0, 243, 255, 0.8)" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
+                                            <motion.circle cx="150" cy="120" r="4" fill="rgba(189, 0, 255, 0.8)" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
+                                            <motion.circle cx="250" cy="80" r="3" fill="rgba(0, 243, 255, 0.8)" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }} />
+                                            <motion.circle cx="350" cy="150" r="4" fill="rgba(189, 0, 255, 0.8)" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }} />
+                                            <motion.circle cx="450" cy="60" r="3" fill="rgba(0, 243, 255, 0.8)" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
+                                            <motion.circle cx="200" cy="200" r="2" fill="rgba(0, 243, 255, 0.8)" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 0.2 }} />
+                                            <motion.circle cx="300" cy="20" r="2" fill="rgba(189, 0, 255, 0.8)" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} />
+                                            <motion.circle cx="300" cy="250" r="3" fill="rgba(0, 243, 255, 0.8)" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1.2 }} />
+                                        </motion.g>
+                                    </svg>
+                                </div>
+
+                                {/* 3. Floating Particles */}
+                                <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                                    {[...Array(15)].map((_, i) => (
+                                        <motion.div
+                                            key={i}
+                                            className="absolute w-1 h-1 bg-cyan-400 rounded-full blur-[1px]"
+                                            initial={{
+                                                x: Math.random() * 500,
+                                                y: 400 + Math.random() * 100,
+                                                opacity: 0.1 + Math.random() * 0.2
+                                            }}
+                                            animate={{
+                                                y: -50,
+                                                x: `calc(${Math.random() * 500}px + ${Math.random() > 0.5 ? 20 : -20}px)`,
+                                                opacity: [0.1, 0.3, 0.1]
+                                            }}
+                                            transition={{
+                                                duration: 10 + Math.random() * 10,
+                                                repeat: Infinity,
+                                                ease: "linear",
+                                                delay: Math.random() * 5
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* 4. Rotating Gradient Orb */}
+                                <motion.div
+                                    className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-gradient-to-br from-[#1E40AF]/30 to-[#3B82F6]/20 blur-[60px] z-0 pointer-events-none"
+                                    animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+                                    transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                                />
+
+                                {/* 5. Light Sweep Effect */}
+                                <motion.div
+                                    className="absolute top-0 bottom-0 w-32 bg-white/5 skew-x-[30deg] z-0 pointer-events-none blur-[10px]"
+                                    initial={{ left: '-150%', opacity: 0 }}
+                                    animate={{ left: '150%', opacity: [0, 1, 0] }}
+                                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 9, ease: "easeInOut" }}
+                                />
+
+                                {/* 6. Legacy hover glow & content container */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-0"></div>
+
+                                <div className="relative z-10 flex flex-col items-center w-full">
+
+                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E40AF]/10 to-[#3B82F6]/10 border border-[#3B82F6]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(59,130,246,0.15)] relative">
+                                        <div className="absolute inset-0 bg-[#3B82F6]/20 blur-md rounded-xl animate-pulse"></div>
+                                        <i className="fa-solid fa-users-viewfinder text-2xl text-[#60A5FA] drop-shadow-[0_0_8px_rgba(96,165,250,0.8)] relative z-10"></i>
+                                    </div>
+
+                                    <h3 className="text-lg font-semibold text-white mb-2 tracking-wide drop-shadow-md">Find the Perfect Match</h3>
+                                    <p className="text-xs text-gray-300 mb-6 text-center max-w-sm font-light leading-relaxed">Leverage AI to rank candidates based on deep skills matching and contextual experience.</p>
+
+                                    <div className="w-full flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-2">
+                                        <a href="/login" className="flex-1 py-3 text-center rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm font-bold text-white shadow-inner hover:bg-white/10 hover:border-white/30 transition-all duration-300 relative overflow-hidden">
+                                            <span className="relative z-10">Sign In</span>
+                                        </a>
+                                        <a href="/register" className="flex-1 py-3 text-center rounded-xl bg-gradient-to-r from-[#1E40AF] to-[#3B82F6] text-white font-bold shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.7)] transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group/btn2">
+                                            <span className="relative z-10">Start Hiring Hub</span>
+                                            <div className="absolute top-0 bottom-0 left-[-100%] w-1/2 bg-white/30 transform skew-x-[-20deg] group-hover/btn2:animate-[shimmer_1s_infinite]"></div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
+            </section>
+        );
+    };
+
+    // 3. Split Feature Section
+    const SplitFeatureSection = () => {
+        return (
+            <section className="py-32 px-6 relative z-10">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                <div className="max-w-7xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        className="text-center mb-20"
+                    >
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Empowering Both Sides of the Desk</h2>
+                        <p className="text-gray-400 max-w-2xl mx-auto text-lg md:text-xl font-light">Deep intelligence for candidates to stand out, and streamlined efficiency for recruiters to hire fast.</p>
+                    </motion.div>
+
+                    <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+                        {/* Left Card - Candidate */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 1, ease: "easeOut" }}
+                            className="bg-glass-heavy border border-white/5 p-10 lg:p-12 rounded-[2.5rem] hover:border-cyan-500/30 transition-all duration-700 group relative overflow-hidden shadow-2xl"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-duration-700"></div>
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500/50 to-cyan-500/0 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-700"></div>
+
+                            <div className="relative z-10">
+                                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-8 shadow-inner shadow-cyan-500/10">
+                                    <i className="fa-solid fa-user-tie text-cyan-400 text-2xl"></i>
+                                </div>
+                                <h3 className="text-3xl font-bold text-white mb-8">For Candidates</h3>
+                                <ul className="space-y-6">
+                                    {[
+                                        "Real-time ATS Score Calculation",
+                                        "Missing Keyword Gap Analysis",
+                                        "Resume Optimization Insights",
+                                        "Section-by-Section AI Feedback"
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-start">
+                                            <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mr-4">
+                                                <i className="fa-solid fa-check text-cyan-400 text-[10px]"></i>
+                                            </div>
+                                            <span className="text-gray-300 text-lg leading-snug">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </motion.div>
+
+                        {/* Right Card - Recruiter */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+                            className="bg-glass-heavy border border-white/5 p-10 lg:p-12 rounded-[2.5rem] hover:border-[#3B82F6]/30 transition-all duration-700 group relative overflow-hidden shadow-2xl"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/5 to-transparent opacity-0 group-hover:opacity-100 transition-duration-700"></div>
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#3B82F6]/0 via-[#3B82F6]/50 to-[#3B82F6]/0 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-700"></div>
+
+                            <div className="relative z-10">
+                                <div className="w-14 h-14 rounded-2xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 flex items-center justify-center mb-8 shadow-inner shadow-[#3B82F6]/10">
+                                    <i className="fa-solid fa-building text-[#60A5FA] text-2xl"></i>
+                                </div>
+                                <h3 className="text-3xl font-bold text-white mb-8">For Recruiters</h3>
+                                <ul className="space-y-6">
+                                    {[
+                                        "Post Jobs & Requirements Easily",
+                                        "AI Candidate Ranking & Sorting",
+                                        "Deep Match Score Percentages",
+                                        "Instant Skill Gap Detection",
+                                        "Efficient Shortlist & Compare"
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-start">
+                                            <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-[#3B82F6]/10 border border-[#3B82F6]/30 flex items-center justify-center mr-4">
+                                                <i className="fa-solid fa-check text-[#60A5FA] text-[10px]"></i>
+                                            </div>
+                                            <span className="text-gray-300 text-lg leading-snug">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+        );
+    };
+
+    // 4. How It Works
+    const HowItWorksSection = () => {
+        const phasesCandidate = [
+            { icon: "fa-cloud-arrow-up", title: "Upload" },
+            { icon: "fa-microchip", title: "AI Scan" },
+            { icon: "fa-bullseye", title: "Score" },
+            { icon: "fa-rocket", title: "Improve" }
+        ];
+        const phasesRecruiter = [
+            { icon: "fa-pen-to-square", title: "Post Job" },
+            { icon: "fa-brain", title: "AI Match" },
+            { icon: "fa-layer-group", title: "Rank" },
+            { icon: "fa-handshake-angle", title: "Hire" }
+        ];
+
+        const FlowRow = ({ title, phases, colorName, colorCode, delayBase }) => (
+            <div className="mb-20">
+                <h4 className="text-xs md:text-sm uppercase tracking-widest text-gray-500 mb-10 ml-4 font-semibold md:text-center lg:text-left">{title}</h4>
+                <div className="flex flex-col md:flex-row items-center justify-between relative px-4 lg:px-8 space-y-12 md:space-y-0">
+                    {/* Connecting Line (Horizontal on MD+) */}
+                    <div className="absolute top-1/2 left-16 right-16 h-[2px] bg-white/5 -translate-y-1/2 z-0 hidden md:block">
+                        <motion.div
+                            className={`h-full ${colorCode === 'cyan' ? 'bg-gradient-to-r from-transparent via-cyan-500 to-transparent' : 'bg-gradient-to-r from-transparent via-[#3B82F6] to-transparent'}`}
+                            initial={{ scaleX: 0, transformOrigin: 'left' }}
+                            whileInView={{ scaleX: 1 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 2.5, ease: "easeInOut" }}
+                        />
+                    </div>
+
+                    {/* Connecting Line (Vertical on Mobile) */}
+                    <div className="absolute left-1/2 top-10 bottom-10 w-[2px] bg-white/5 -translate-x-1/2 z-0 md:hidden"></div>
+
+                    {phases.map((phase, i) => (
+                        <motion.div
+                            key={i}
+                            className="relative z-10 flex flex-col items-center group w-full md:w-auto"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, delay: delayBase + (i * 0.2), ease: "easeOut" }}
+                        >
+                            <div className={`w-20 h-20 rounded-[1.25rem] bg-[#0A0F1F] border border-white/5 flex items-center justify-center mb-5 relative shadow-xl ${colorCode === 'cyan' ? 'group-hover:border-cyan-500/50 group-hover:bg-cyan-500/5' : 'group-hover:border-[#3B82F6]/50 group-hover:bg-[#3B82F6]/5'} transition-all duration-500`}>
+                                {/* Soft pulse ring */}
+                                <motion.div
+                                    className={`absolute inset-[-4px] rounded-[1.5rem] border ${colorCode === 'cyan' ? 'border-cyan-500/30' : 'border-[#3B82F6]/30'} opacity-0`}
+                                    animate={{ scale: [1, 1.15, 1], opacity: [0, 0.4, 0] }}
+                                    transition={{ duration: 4, repeat: Infinity, delay: i * 0.5, ease: "easeInOut" }}
+                                />
+                                <i className={`fa-solid ${phase.icon} text-2xl text-gray-500 group-hover:text-white transition-colors duration-300`}></i>
+                            </div>
+                            <span className="text-base font-medium text-gray-400 group-hover:text-white transition-colors drop-shadow-sm">{phase.title}</span>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        return (
+            <section className="py-32 px-6 bg-[#020617]/50 relative z-10 border-y border-white/5 backdrop-blur-md">
+                <div className="max-w-6xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5 }}
+                        className="text-center mb-24"
+                    >
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Frictionless Workflows</h2>
+                        <div className="w-24 h-1 bg-gradient-to-r from-cyan-500 to-[#3B82F6] mx-auto rounded-full"></div>
+                    </motion.div>
+
+                    <FlowRow title="Candidate Process" phases={phasesCandidate} colorName="text-neon-cyan" colorCode="cyan" delayBase={0} />
+                    <FlowRow title="Recruiter Process" phases={phasesRecruiter} colorName="text-[#60A5FA]" colorCode="blue" delayBase={0.3} />
+
+                </div>
+            </section>
+        );
+    };
+
+    // 5. Live Demo Section
+    const DemoProgress = () => {
+        const [score, setScore] = useState(0);
+        const inViewRef = useRef(null);
+        const isInView = window.Motion.useInView(inViewRef, { once: true, margin: "-100px" });
+
+        useEffect(() => {
+            if (isInView) {
+                let start = 0;
+                const end = 87;
+                const duration = 2500;
+                const stepTime = Math.abs(Math.floor(duration / end));
+
+                const timer = setInterval(() => {
+                    start += 1;
+                    setScore(start);
+                    if (start === end) clearInterval(timer);
+                }, stepTime);
+                return () => clearInterval(timer);
+            }
+        }, [isInView]);
+
+        const circumference = 2 * Math.PI * 15.9155;
+        const strokeDashoffset = circumference - (score / 100) * circumference;
+
+        return (
+            <section className="py-32 px-6 relative z-10 overflow-hidden" ref={inViewRef}>
+
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full bg-gradient-to-l from-cyan-500/5 to-transparent blur-[100px] -z-10 pointer-events-none rounded-full"></div>
+
+                <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-20">
+
+                    {/* Left side text & bars */}
+                    <div className="flex-1 w-full order-2 lg:order-1">
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Deep Intelligence at a Glance</h2>
+                        <p className="text-gray-400 text-lg md:text-xl font-light mb-12 leading-relaxed">
+                            Our proprietary AI engine evaluates context, semantics, and keyword density against job descriptions with unprecedented accuracy.
+                        </p>
+
+                        <div className="space-y-8">
+                            <div>
+                                <div className="flex justify-between text-base mb-3 font-medium">
+                                    <span className="text-gray-300">Skills Match</span>
+                                    <span className="text-cyan-400 font-bold">92%</span>
+                                </div>
+                                <div className="h-2.5 w-full bg-white/5 rounded-full overflow-hidden shadow-inner">
+                                    <motion.div
+                                        className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 rounded-full relative"
+                                        initial={{ width: "0%" }}
+                                        whileInView={{ width: "92%" }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 2.5, ease: "easeOut", delay: 0.5 }}
+                                    >
+                                        <div className="absolute top-0 right-0 bottom-0 w-10 bg-white/30 blur-sm"></div>
+                                    </motion.div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex justify-between text-base mb-3 font-medium">
+                                    <span className="text-gray-300">Experience Match</span>
+                                    <span className="text-blue-400 font-bold">85%</span>
+                                </div>
+                                <div className="h-2.5 w-full bg-white/5 rounded-full overflow-hidden shadow-inner">
+                                    <motion.div
+                                        className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full relative"
+                                        initial={{ width: "0%" }}
+                                        whileInView={{ width: "85%" }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 2.5, ease: "easeOut", delay: 0.7 }}
+                                    >
+                                        <div className="absolute top-0 right-0 bottom-0 w-10 bg-white/30 blur-sm"></div>
+                                    </motion.div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex justify-between text-base mb-3 font-medium">
+                                    <span className="text-gray-300">Education Match</span>
+                                    <span className="text-[#60A5FA] font-bold">100%</span>
+                                </div>
+                                <div className="h-2.5 w-full bg-white/5 rounded-full overflow-hidden shadow-inner">
+                                    <motion.div
+                                        className="h-full bg-gradient-to-r from-[#1E40AF] to-[#60A5FA] rounded-full relative"
+                                        initial={{ width: "0%" }}
+                                        whileInView={{ width: "100%" }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 2.5, ease: "easeOut", delay: 0.9 }}
+                                    >
+                                        <div className="absolute top-0 right-0 bottom-0 w-10 bg-white/30 blur-sm"></div>
+                                    </motion.div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right side circle demo */}
+                    <div className="flex-1 w-full flex justify-center lg:justify-end order-1 lg:order-2">
+                        <motion.div
+                            className="bg-[#050b14] border border-white/10 p-12 rounded-[3.5rem] shadow-2xl relative w-full max-w-md float-right"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1.2, ease: "easeOut" }}
+                        >
+                            {/* Soft breathing glow behind */}
+                            <motion.div
+                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-cyan-500/20 blur-[60px] rounded-full -z-10"
+                                animate={{ opacity: [0.4, 0.8, 0.4], scale: [0.9, 1.1, 0.9] }}
+                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                            />
+
+                            <div className="relative w-full aspect-square flex items-center justify-center">
+                                <svg viewBox="0 0 36 36" className="circular-chart transform -rotate-90 w-full h-full drop-shadow-[0_0_20px_rgba(0,243,255,0.3)]">
+                                    <path className="circle-bg"
+                                        d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                    <motion.path className="circle stroke-[url(#gradient)]"
+                                        strokeDasharray={`${score}, 100`}
+                                        d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                    <defs>
+                                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stopColor="#3B82F6" />
+                                            <stop offset="100%" stopColor="#00f3ff" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span className="text-7xl font-bold text-white tracking-tighter drop-shadow-lg">{score}<span className="text-2xl text-gray-400 font-light">%</span></span>
+                                    <span className="text-sm uppercase tracking-[0.3em] text-cyan-400 mt-2 font-semibold">Match score</span>
+                                </div>
+                            </div>
+
+                            <motion.div
+                                className="mt-10 text-center bg-white/5 rounded-2xl p-5 border border-white/5 backdrop-blur-md"
+                                initial={{ opacity: 0, y: 10 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 2, duration: 1 }}
+                            >
+                                <p className="text-base font-semibold text-gray-100 flex items-center justify-center">
+                                    <i className="fa-solid fa-circle-check text-green-400 mr-2 text-lg"></i>
+                                    Excellent Match
+                                </p>
+                                <p className="text-sm text-gray-400 mt-2">Just <span className="text-white font-medium">3 keywords</span> missing from JD</p>
+                            </motion.div>
+
+                        </motion.div>
+                    </div>
+
+                </div>
+            </section>
+        );
+    };
+
+    // 6. Trust / Stats Section
+    const StatsSection = () => {
+        const StatItem = ({ end, label, suffix = "", duration = 2000 }) => {
+            const [count, setCount] = useState(0);
+            const ref = useRef(null);
+            const isInView = window.Motion.useInView(ref, { once: true });
+
+            useEffect(() => {
+                if (isInView) {
+                    let start = 0;
+                    const startTime = performance.now();
+
+                    const animate = (currentTime) => {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const easeProgress = 1 - Math.pow(1 - progress, 4); // easeOutQuart
+
+                        setCount(Math.floor(easeProgress * end));
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            setCount(end);
+                        }
+                    };
+                    requestAnimationFrame(animate);
+                }
+            }, [isInView, end, duration]);
+
+            return (
+                <motion.div
+                    ref={ref}
+                    className="text-center p-6"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                >
+                    <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 drop-shadow-md">
+                        {count.toLocaleString()}<span className="text-cyan-400">{suffix}</span>
+                    </div>
+                    <div className="text-sm md:text-base uppercase tracking-widest text-gray-400 font-semibold">{label}</div>
+                </motion.div>
+            );
+        };
+
+        return (
+            <section className="py-24 px-6 bg-gradient-to-b from-transparent to-[#0a0a0a] relative z-10">
+                <div className="max-w-7xl mx-auto border-y border-white/5 py-12">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 divide-x divide-white/5">
+                        <StatItem end={125000} label="Resumes Analyzed" suffix="+" duration={3500} />
+                        <StatItem end={98} label="Match Accuracy" suffix="%" duration={2500} />
+                        <StatItem end={4500} label="Active Recruiters" suffix="+" duration={3000} />
+                        <StatItem end={85000} label="Successful Matches" suffix="+" duration={3800} />
+                    </div>
+                </div>
+            </section>
+        );
+    };
+
+    // 7. Final CTA Section
+    const FinalCTA = () => {
+        return (
+            <section className="py-40 px-6 relative z-10 overflow-hidden text-center bg-[#050b14]">
+                {/* Soft inner glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[800px] h-full max-h-[800px] bg-gradient-to-r from-[#06B6D4]/10 to-[#3B82F6]/10 blur-[120px] -z-10 rounded-full mix-blend-screen pointer-events-none"></div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
+                    className="max-w-4xl mx-auto"
+                >
+                    <h2 className="text-5xl md:text-7xl font-bold text-white mb-10 tracking-tight leading-tight">
+                        Ready to Optimize or <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#06B6D4] to-[#3B82F6]">Hire Smarter?</span>
+                    </h2>
+
+                    <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className="inline-block relative group mt-4">
+                        <div className="absolute -inset-1.5 bg-gradient-to-r from-[#06B6D4] to-[#3B82F6] rounded-full blur-md opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-300"></div>
+                        <div className="relative px-12 py-5 bg-[#0a0a0a] rounded-full leading-none flex items-center justify-center">
+                            <span className="text-white font-bold text-xl mr-3 transition-all duration-300">
+                                Get Started Now
+                            </span>
+                            <i className="fa-solid fa-arrow-right text-cyan-400 group-hover:translate-x-1 transition-transform duration-300"></i>
+
+                            {/* Slow light sweep on hover inner */}
+                            <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+                                <div className="absolute top-0 bottom-0 left-[-100%] w-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-20deg] group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                            </div>
+                        </div>
+                    </a>
+                </motion.div>
+            </section>
+        );
+    };
+
+    // ----- MAIN APP -----
+    const App = () => {
+        return (
+            <div className="font-sans antialiased text-gray-200">
+                <AnimatedBackground />
+                <HeroSection />
+                <SplitFeatureSection />
+                <HowItWorksSection />
+                <DemoProgress />
+                <StatsSection />
+                <FinalCTA />
+            </div>
+        );
+    };
+
+    const rootElement = document.getElementById('root');
+    if (rootElement) {
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(
+            <React.StrictMode>
+                <App />
+            </React.StrictMode>
+        );
+    }
+    {% endraw %}
+</script>
 {% endblock %}
