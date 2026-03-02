@@ -13,7 +13,6 @@ main = Blueprint('main', __name__)
 
 
 @main.route('/')
-@login_required
 def index():
     try:
         from utils.constants import TARGET_ROLES
@@ -27,7 +26,7 @@ def index():
             "Cybersecurity": ["Cybersecurity Analyst", "Security Engineer"],
             "Testing": ["QA Engineer", "Automation Test Engineer"],
         }
-    return render_template('index.html', target_roles=target_roles)
+    return render_template('index.html', target_roles=target_roles, is_authenticated=current_user.is_authenticated, user_role=current_user.role if current_user.is_authenticated else None)
 
 
 

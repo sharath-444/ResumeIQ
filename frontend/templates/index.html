@@ -149,6 +149,8 @@
     const { motion, AnimatePresence, useScroll, useTransform } = window.Motion;
 
     const TARGET_ROLES = {{ target_roles | tojson | safe if target_roles else '{}' }};
+    const IS_AUTHENTICATED = {{ 'true' if is_authenticated else 'false' }};
+    const USER_ROLE = {{ user_role | tojson | safe if user_role else 'null' }};
 
     {% raw %}
     // ----- COMPONENTS -----
@@ -294,7 +296,22 @@
         const [role, setRole] = useState('candidate');
         const [selectedRoleValue, setSelectedRoleValue] = useState('');
         const [selectedFile, setSelectedFile] = useState(null);
+        const [isDragging, setIsDragging] = useState(false);
         const fileInputRef = useRef(null);
+
+        // Prevent default drag behaviors on window level to avoid opening files dropped outside dropzone
+        useEffect(() => {
+            const preventDefault = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            };
+            window.addEventListener('dragover', preventDefault);
+            window.addEventListener('drop', preventDefault);
+            return () => {
+                window.removeEventListener('dragover', preventDefault);
+                window.removeEventListener('drop', preventDefault);
+            };
+        }, []);
 
         // Smooth Parallax
         const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -496,8 +513,31 @@
                                     />
 
                                     <div
-                                        className={`w-full border-2 border-dashed rounded-xl p-4 transition-all duration-300 cursor-pointer mb-5 flex flex-col items-center justify-center group/drop ${selectedFile ? 'border-[#3B82F6]/50 bg-[#3B82F6]/5' : 'border-white/10 hover:border-[#3B82F6]/30 hover:bg-[#3B82F6]/5'}`}
+                                        className={`w-full border-2 border-dashed rounded-xl p-4 transition-all duration-300 cursor-pointer mb-5 flex flex-col items-center justify-center group/drop ${isDragging ? 'border-[#3B82F6] bg-[#3B82F6]/20' : selectedFile ? 'border-[#3B82F6]/50 bg-[#3B82F6]/5' : 'border-white/10 hover:border-[#3B82F6]/30 hover:bg-[#3B82F6]/5'}`}
                                         onClick={() => fileInputRef.current?.click()}
+                                        onDragOver={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setIsDragging(true);
+                                        }}
+                                        onDragLeave={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setIsDragging(false);
+                                        }}
+                                        onDrop={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setIsDragging(false);
+                                            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                                                const file = e.dataTransfer.files[0];
+                                                if (file.name.endsWith('.pdf') || file.name.endsWith('.docx')) {
+                                                    setSelectedFile(file);
+                                                } else {
+                                                    alert("Please upload a PDF or DOCX file.");
+                                                }
+                                            }
+                                        }}
                                     >
                                         {selectedFile ? (
                                             <div className="flex items-center text-[#60A5FA] font-medium">
@@ -626,15 +666,27 @@
                                     <h3 className="text-lg font-semibold text-white mb-2 tracking-wide drop-shadow-md">Find the Perfect Match</h3>
                                     <p className="text-xs text-gray-300 mb-6 text-center max-w-sm font-light leading-relaxed">Leverage AI to rank candidates based on deep skills matching and contextual experience.</p>
 
-                                    <div className="w-full flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-2">
-                                        <a href="/login" className="flex-1 py-3 text-center rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm font-bold text-white shadow-inner hover:bg-white/10 hover:border-white/30 transition-all duration-300 relative overflow-hidden">
-                                            <span className="relative z-10">Sign In</span>
-                                        </a>
-                                        <a href="/register" className="flex-1 py-3 text-center rounded-xl bg-gradient-to-r from-[#1E40AF] to-[#3B82F6] text-white font-bold shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.7)] transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group/btn2">
-                                            <span className="relative z-10">Start Hiring Hub</span>
-                                            <div className="absolute top-0 bottom-0 left-[-100%] w-1/2 bg-white/30 transform skew-x-[-20deg] group-hover/btn2:animate-[shimmer_1s_infinite]"></div>
-                                        </a>
-                                    </div>
+                                    {IS_AUTHENTICATED ? (
+                                        <div className="w-full flex flex-col space-y-4 mb-2">
+                                            <a href={USER_ROLE === 'admin' ? '/admin/dashboard' : '/dashboard'} className="w-full py-3 text-center rounded-xl bg-gradient-to-r from-[#1E40AF] to-[#3B82F6] text-white font-bold shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.7)] transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group/btn2">
+                                                <span className="relative z-10">Go to My Dashboard</span>
+                                                <div className="absolute top-0 bottom-0 left-[-100%] w-1/2 bg-white/30 transform skew-x-[-20deg] group-hover/btn2:animate-[shimmer_1s_infinite]"></div>
+                                            </a>
+                                            <a href="/auth/logout" className="w-full py-3 text-center rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm font-bold text-white shadow-inner hover:bg-white/10 hover:border-white/30 transition-all duration-300">
+                                                Sign Out
+                                            </a>
+                                        </div>
+                                    ) : (
+                                        <div className="w-full flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-2">
+                                            <a href="/auth/login" className="flex-1 py-3 text-center rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm font-bold text-white shadow-inner hover:bg-white/10 hover:border-white/30 transition-all duration-300 relative overflow-hidden">
+                                                <span className="relative z-10">Sign In</span>
+                                            </a>
+                                            <a href="/auth/register" className="flex-1 py-3 text-center rounded-xl bg-gradient-to-r from-[#1E40AF] to-[#3B82F6] text-white font-bold shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.7)] transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group/btn2">
+                                                <span className="relative z-10">Start Hiring Hub</span>
+                                                <div className="absolute top-0 bottom-0 left-[-100%] w-1/2 bg-white/30 transform skew-x-[-20deg] group-hover/btn2:animate-[shimmer_1s_infinite]"></div>
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
                             </motion.div>
                         )}
